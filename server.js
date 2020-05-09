@@ -46,8 +46,12 @@ io.sockets.on('connection', function (socket, pseudo) {
     // Dès qu'on nous donne un pseudo, on le stocke en variable de session
     socket.on('pseudo', function(pseudo) {
         socket.pseudo = pseudo;
-        console.log(pseudo);
+        console.log(pseudo+" vient de se connecter.");
     });
+
+    socket.on('disconnect', function(){
+    	console.log(socket.pseudo+" vient de se déconnecter.");
+    })
 
 });
 
