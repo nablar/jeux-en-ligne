@@ -8,15 +8,15 @@
     <body>
         <h1>Bienvenue sur le jeu Dixit !</h1>
 
-        <div id="message-server"></div>
-
-        <p>Choisi ton pseudo</p>
-        <form>
+        <p>Choisis ton pseudo</p>
+        <p>
             <label for="pseudo">Pseudo</label>
-            <input type="text" id="pseudo-input" name="pseudo" value="pseudo">
-            <input type="submit" value="pseudo" onclick="sendPseudo()"/>
-        </form> 
+            <input type="text" id="pseudo-input" name="pseudo" placeholder="Pseudo">
+            <input type="submit" value="Valider" onclick="sendPseudo()"/>
+        </p> 
 
+
+        <div id="message-server"></div>
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
