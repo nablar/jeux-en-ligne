@@ -8,6 +8,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 var players = [];
+var chef; 
 
 // Chargement du fichier index.html affiché au client
 app.get('/', function(req, res) {
@@ -24,29 +25,53 @@ app.get('/waiting_room', function(req, res) {
 
 
 io.sockets.on('connection', function (socket, pseudo) {
-    
-    // Quand un client se connecte, on lui envoie un message
-    //socket.emit('message', 'Vous êtes bien connecté !');
 
     // Dès qu'on nous donne un pseudo, on le stocke en variable de session
     socket.on('pseudo', function(pseudo) {
         socket.pseudo = pseudo;
-        console.log(pseudo + " vient de se connecter.");
-        players.push(pseudo);
-        // On signale aux autres clients qu'il y a un nouveau venu
-        socket.broadcast.emit('new_player', pseudo);
+        var pseudo_ok = check_pseudo(pseudo);
+        if(pseudo_ok) {
+          console.log(pseudo + " vient de se connecter.");
+          if(players.length == 0){
+            chef = pseudo;
+          }
+          players.push(pseudo);
+          // On signale aux autres clients qu'il y a un nouveau venu
+          socket.broadcast.emit('new_player', pseudo);
 
-        const destination = '/waiting_room';
-        socket.emit('redirect', destination);
+          const destination = '/waiting_room';
+          socket.emit('redirect', destination);
+        }
+        else {
+          socket.emit('message', "Ce pseudo est déjà pris, choisis-en un autre.")
+        }
 
     });
 
+    socket.on('ask_pseudo', function(){
+      socket.emit('send_pseudo', socket.pseudo);
+    })
+
     socket.on('disconnect', function(){
-    	console.log(socket.pseudo+" vient de se déconnecter.");
+    	console.log(socket.pseudo + " vient de se déconnecter.");
     })
 
 });
 
 
+
 // Ecoute sur le port 50000
 server.listen(50000);
+
+
+function check_pseudo(pseudo) {
+  if(pseudo=='') {
+    return false;
+  }
+  for(var i = 0 ; i < players.length ; i++) {
+    if(pseudo == players[i]) {
+      return false;
+    }
+  }
+  return true;
+}

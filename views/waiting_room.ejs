@@ -10,6 +10,8 @@
 
         <p>Attendons que tout le monde soit prêt !</p>
         
+        <div id="pseudo"></div>
+
         <div id="players"> En ligne : 
         <ul id="ul-list">
         <%
@@ -26,6 +28,12 @@
         <script>
             var socket = io.connect('http://localhost:50000');
 
+            socket.emit('ask_pseudo');
+
+            socket.on('send_pseudo', function(pseudo) {
+                document.getElementById("pseudo").innerHTML = "Hello " + pseudo;
+            })
+
             // Mise à jour de la liste des joueurs
             socket.on('new_player', function(pseudo) {
                 var ul = document.getElementById("ul-list");
@@ -33,6 +41,8 @@
                 li.appendChild(document.createTextNode(pseudo));
                 ul.appendChild(li);
             })
+
+
 
         </script>
     </body>
