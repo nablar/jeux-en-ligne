@@ -8,6 +8,8 @@
     <body>
         <h1>Bienvenue sur le jeu Dixit !</h1>
 
+        <div id="message-server"></div>
+
         <p>Choisi ton pseudo</p>
         <form>
             <label for="pseudo">Pseudo</label>
@@ -27,7 +29,11 @@
 
             // On affiche une boîte de dialogue quand le serveur nous envoie un "message"
             socket.on('message', function(message) {
-                alert('Le serveur a un message pour vous : ' + message);
+                document.getElementById("message-server").innerHTML = 'Le serveur a un message pour vous : ' + message;
+                setTimeout(function() {
+                    document.getElementById("message-server").innerHTML = ''; 
+                }, 1000);
+                
             })
 
         </script>
