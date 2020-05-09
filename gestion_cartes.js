@@ -59,7 +59,7 @@ function getDefausse(){
 function tirerCartes(nombre){
 	let main = [] // Le tableau contenant les cartes tirées
 	while(main.length < nombre) {
-		main.push(tirerCarte()); // tirerCarte gère automatiquement le manque de cartes dans la pile en comblant par la défausse
+		main.push(tirerCarte()); // tirerCarte gère automatiquement le manque éventuel de cartes dans la pile
 	}
 	return main;
 }
@@ -72,7 +72,7 @@ function defausserCartes(cartes){
 }
 
 
-chargerCartes();
+chargerCartes(); // On charge toutes les cartes du dossier
 
 // Exporter les fonctions
 exports.getToutesCartes = getToutesCartes; 
