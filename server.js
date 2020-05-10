@@ -1,11 +1,13 @@
 const http = require('http');
 const fs = require('fs');
 const express = require('express');
+const gestionCartes = require('./gestion_cartes');
 
 const app = require('express')();
 const server = require('http').Server(app);
 // Chargement de socket.io
 const io = require('socket.io')(server);
+
 
 const session = require('express-session') ({
   secret:'dixit',
@@ -20,7 +22,9 @@ app.use(session);
 var players = [];
 var chef; 
 
-// Chargement du fichier index.html affiché au client
+
+
+// Chargement du fichier pseudo.html affiché au client
 app.get('/', function(req, res) {
     fs.readFile('views/pseudo.html', 'utf-8', function(error, content) {
         res.writeHead(200, {"Content-Type": "text/html"});
