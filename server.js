@@ -10,6 +10,8 @@ const io = require('socket.io')(server);
 
 let players = [];
 let chef; 
+let index_counter;
+//let welcom = true;  //welcom = true if new gamers are welcomed, = false if the game already started
 
 app.use(express.static('cartes'));
 // Chargement du fichier pseudo.html affiché au client
@@ -42,7 +44,9 @@ io.sockets.on('connection', function (socket, pseudo) {
           
           if(players.length == 0){
             chef = pseudo;
-            socket.emit('leader');
+            //socket.emit('leader');
+            socket.emit('new_leader', chef);
+            socket.broadcast.emit('new_leader', chef);
           }
           players.push(pseudo);
 
@@ -80,6 +84,9 @@ io.sockets.on('connection', function (socket, pseudo) {
     socket.on('start_game', function() {
       socket.emit('change_view', "C");
       socket.broadcast.emit('change_view', "C");
+      index_counter = 0;
+      socket.emit('counter', socket.pseudo);
+      socket.broadcast.emit('counter', socket.pseudo);
     });
 
 
@@ -111,4 +118,9 @@ function check_pseudo(pseudo) {
     }
   }
   return true;
+}
+
+function next_counter() {
+  index_counter = (index_counter + 1) % players.length;
+  return players[index_counter];
 }

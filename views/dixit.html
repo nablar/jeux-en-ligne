@@ -19,6 +19,9 @@
             div.current-chef{
                 display:block;
             }
+            div.hide-if-not-counter{
+                display:none;
+            }
             th{
                 width:30%;
                 height: 50%;
@@ -66,9 +69,19 @@
             </div>
         </div>
 
+
+
         <!-- VUE C : voir ses cartes -->
         <div id="vue-C" class="vue">
-            <h1>Voici ton jeu ! Choisis une carte.</h1>
+            <!--<h1>Voici ton jeu ! Choisis une carte.</h1>-->
+            <div class="counter"></div>
+
+            <div class="hide-if-not-counter">
+                <label for="phrase-clef">Phrase clef</label>
+                <input type="text" id="phrase-clef-input" name="phrase-clef" placeholder="phrase-clef">
+                <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
+            </div>
+
             <div class="cards-container">
                 <table>
                     <tbody>
@@ -87,9 +100,12 @@
             </div>
         </div>
 
+
+
         <!-- VUE D : voir les cartes sur le plateau -->
         <div id="vue-D" class="vue">
             <h1>Selon toi, quelle carte correspond à "<span id="phrase-clef"></span>" ?</h1>
+
             <div class="cards-container">
                 <table>
                     <tbody id="plateau">
@@ -139,19 +155,22 @@
                     ul.appendChild(li);
                 }
             })
-
+            /*
             socket.on('leader', function() {
                 for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
                     document.getElementsByClassName("chef")[i].classList.add("current-chef");
                 }
-            });
+            }); */
 
             socket.on('new_leader', function(pseudo_chef) {
-                socket.emit('log-message', "mon pseudo est " + pseudo);
                 if(pseudo_chef==pseudo) {
-                    socket.emit('log-message', "je suis le nouveau chef : " + pseudo);
+                    socket.emit('log-message', "Je suis le nouveau chef : " + pseudo);
                     for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
                         document.getElementsByClassName("chef")[i].classList.add("current-chef");
+                    }
+                } else {
+                    for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
+                        document.getElementsByClassName("chef")[i].classList.remove("current-chef");
                     }
                 }
             });
@@ -170,6 +189,17 @@
                     document.getElementById("carte"+i).src = cartes[i];
                 }
             });
+
+            socket.on('counter', function(pseudo_counter) {
+                let c = document.getElementsByClassName("counter")[0];
+                if(pseudo==pseudo_counter) {
+                    c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase."
+                    document.getElementsByClassName("hide-if-not-counter")[0].classList.remove("hide-if-not-counter");
+                    
+                } else {
+                    c.innerHTML = "Le conteur est : " + pseudo_counter + ". Attends qu'il ait choisi sa carte."
+                }
+            })
 
             function cardSelected(id){
                 if(document.getElementsByClassName("carte-choisie").length>0){
