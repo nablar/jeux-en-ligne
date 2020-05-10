@@ -31,6 +31,7 @@ io.sockets.on('connection', function (socket, pseudo) {
           
           if(players.length == 0){
             chef = pseudo;
+            socket.emit('chef');
           }
           players.push(pseudo);
 

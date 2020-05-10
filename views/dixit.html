@@ -13,6 +13,12 @@
             div.current-view{
                 display:block;
             }
+            div.chef{
+                display:none;
+            }
+            div.current-chef{
+                display:block;
+            }
     </style>
         <!-- VUE A : choix du pseudo -->
         <div id="vue-A" class="current-view vue">
@@ -32,11 +38,17 @@
         <div id="vue-B" class="vue">
             <h1>Vive le Dixit !</h1>
             <p>Attendons que tout le monde soit prêt...</p>
-        
-            <div id="pseudo"></div> </br>
+            
+            <div id="pseudo"></div>
+            <div class="chef">Tu es le chef du groupe, c'est à toi de décider quand commencer (attends que tout le monde soit là...)</div>
+            </br>
 
             <div id="players"> En ligne : 
                 <ul id="ul-list"> </ul>
+            </div>
+
+            <div class="chef">
+                <input type="submit" value="Commencer" onclick="start_game()"/>
             </div>
         </div>
 
@@ -77,6 +89,12 @@
                     ul.appendChild(li);
                 }
             })
+
+            socket.on('chef', function() {
+                for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
+                    document.getElementsByClassName("chef")[i].classList.add("current-chef");
+                }
+            });
 
             /*
             // Mise à jour de la liste des joueurs
