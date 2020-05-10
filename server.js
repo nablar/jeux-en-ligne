@@ -132,7 +132,7 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     socket.on('guesser_choice', function(pseudo, card) {
       guesses[pseudo]=card;
-      if(Object.keys(guesses).length==players.length){
+      if(Object.keys(guesses).length == players.length-1){
         computeScores();
         socket.emit('change_view', "E");
         socket.emit('scores', scores);

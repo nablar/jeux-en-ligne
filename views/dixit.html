@@ -96,10 +96,10 @@
         <div id="vue-C" class="vue">
             <h1 class="counter"></h1>
 
-            <h1 id="inst-with-keyphrase" class="hide-if-counter" style="display:none">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>" ?</h1>
+            <h1 id="inst-with-keyphrase" class="hide-if-counter" style="display:none">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>"</h1>
 
             <div id="phrase-clef-input" class="hide-if-not-counter">
-                <input type="text" name="phrase-clef" placeholder="Ta phrase">
+                <input type="text" id="phrase-clef-input-text" name="phrase-clef" placeholder="Ta phrase">
                 <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
             </div>
 
@@ -156,7 +156,6 @@
         <script src="/socket.io/socket.io.js"></script>
         <script>
             let socket = io.connect('http://localhost:50000');
-            console.log(socket);
             let pseudo;
             let counter=false;
 
@@ -164,7 +163,6 @@
                 pseudo = document.getElementById("pseudo-input").value;
                 socket.emit('pseudo', pseudo);
                 document.getElementById("pseudo").innerHTML = "Bienvenue " + pseudo + " !";
-                console.log("send the pseudo");
             }
 
 
@@ -262,7 +260,7 @@
                 } else {
                     let carte = document.getElementsByClassName("carte-choisie")[0];
                     let src = carte.src;
-                    key_phrase = document.getElementById("phrase-clef-input").value;
+                    key_phrase = document.getElementById("phrase-clef-input-text").value;
                     socket.emit('counter_choice', src, key_phrase);
                 }
             }
