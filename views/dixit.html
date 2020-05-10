@@ -59,10 +59,11 @@
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            var socket = io.connect('http://localhost:50000');
+            let socket = io.connect('http://localhost:50000');
+            let pseudo;
 
             function sendPseudo() {
-                var pseudo = document.getElementById("pseudo-input").value;
+                pseudo = document.getElementById("pseudo-input").value;
                 socket.emit('pseudo', pseudo);
                 document.getElementById("pseudo").innerHTML = "Hello " + pseudo;
             }
@@ -90,9 +91,19 @@
                 }
             })
 
-            socket.on('chef', function() {
+            socket.on('leader', function() {
                 for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
                     document.getElementsByClassName("chef")[i].classList.add("current-chef");
+                }
+            });
+
+            socket.on('new_leader', function(pseudo_chef) {
+                socket.emit('log-message', "mon pseudo est " + pseudo);
+                if(pseudo_chef==pseudo) {
+                    socket.emit('log-message', "je suis le nouveau chef : " + pseudo);
+                    for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
+                        document.getElementsByClassName("chef")[i].classList.add("current-chef");
+                    }
                 }
             });
 

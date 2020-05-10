@@ -31,7 +31,7 @@ io.sockets.on('connection', function (socket, pseudo) {
           
           if(players.length == 0){
             chef = pseudo;
-            socket.emit('chef');
+            socket.emit('leader');
           }
           players.push(pseudo);
 
@@ -58,6 +58,12 @@ io.sockets.on('connection', function (socket, pseudo) {
       }
       players.splice(index,1);
       socket.broadcast.emit('players_list', players);
+
+      if(socket.pseudo==chef) {
+        chef = players[0];
+        socket.broadcast.emit('new_leader', chef);
+        console.log("le nouveau chef est " + chef);
+      }
     });
 
     socket.on('log-message', function(message) {
