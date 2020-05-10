@@ -220,7 +220,11 @@
                     counter=false;
                     c.innerHTML = "Le conteur est : " + pseudo_counter + ". Attends qu'il ait choisi sa carte."
                 }
-            })
+            });
+
+            socket.on('start_guessing', function(nbJoueurs, cartes){
+                populatePlateau(nbJoueurs, cartes);
+            });
 
 
             function sendKeyPhrase(){
@@ -277,7 +281,7 @@
                 document.getElementById(id).classList.add("carte-choisie");
             }
 
-            function populatePlateau(nbJoueurs){
+            function populatePlateau(nbJoueurs, cartes){
                 // 3 cartes par ligne
                 nbLignes = Math.floor(nbJoueurs/3);
                 if(nbJoueurs%3 != 0){
@@ -291,6 +295,7 @@
                             break;
                         }
                         carte = document.createElement("img");
+                        carte.src = cartes[3*i+j];
                         carte.classList.add("carte")
                         carte.id = "carte"+i+"-"+j;
                         carte.onclick = "cardSelected(this.id)";
