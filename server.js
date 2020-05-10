@@ -10,6 +10,7 @@ const io = require('socket.io')(server);
 
 let players = [];
 let chef; 
+let counter;
 let index_counter;
 let chosen_cards={};
 let guesses={};
@@ -27,7 +28,6 @@ app.get('/', function(req, res) {
 })
 .get('/cartes/:nom', function(req, res){
 	if(req.params.nom.match(/^[0-9]+\.png$/g)){
-		console.log("carte "+req.params.nom+" demandée");
 		fs.readFile('cartes/'+req.params.nom, function(error, content) {
 			res.writeHead(200, {"Content-Type": "image/png"});
 			res.end(content);
@@ -90,6 +90,7 @@ io.sockets.on('connection', function (socket, pseudo) {
       socket.emit('change_view', "C");
       socket.broadcast.emit('change_view', "C");
       index_counter = 0;
+      counter=socket.pseudo;
       socket.emit('counter', socket.pseudo);
       socket.broadcast.emit('counter', socket.pseudo);
     });
@@ -158,5 +159,5 @@ function check_pseudo(pseudo) {
 
 function next_counter() {
   index_counter = (index_counter + 1) % players.length;
-  return players[index_counter];
+  counter=players[index_counter];
 }
