@@ -78,12 +78,15 @@
         <div id="vue-C" class="vue">
             <!--<h1>Voici ton jeu ! Choisis une carte.</h1>-->
             <div class="counter"></div>
+            <div class="phrase-clef"></div>
 
             <div class="hide-if-not-counter">
                 <label for="phrase-clef">Phrase clef</label>
                 <input type="text" id="phrase-clef-input" name="phrase-clef" placeholder="phrase-clef">
                 <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
             </div>
+
+            <input id="choose-card-to-play" type="submit" value="Valider" onclick="cardToPlayChosen()"/>
 
             <div class="cards-container">
                 <table>
@@ -107,7 +110,7 @@
 
         <!-- VUE D : voir les cartes sur le plateau -->
         <div id="vue-D" class="vue">
-            <h1>Selon toi, quelle carte correspond à "<span id="phrase-clef"></span>" ?</h1>
+            <h1>Selon toi, quelle carte correspond à "<span class="phrase-clef"></span>" ?</h1>
             <div class="vote-except-counter">
                 <input type="submit" value="Voter" onclick="sendVote()"/>
             </div>
@@ -212,7 +215,7 @@
                     counter=true;
                     c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase."
                     document.getElementsByClassName("hide-if-not-counter")[0].classList.remove("hide-if-not-counter");
-                    
+                    document.getElementById("choose-card-to-play").parentNode.removeChild(document.getElementById("choose-card-to-play"));
                 } else {
                     counter=false;
                     c.innerHTML = "Le conteur est : " + pseudo_counter + ". Attends qu'il ait choisi sa carte."
@@ -232,8 +235,26 @@
             }
 
             socket.on('reveal_counter_choice', function(card, key_phrase) {
-                document.getElementById("phrase-clef").innerHTML = key_phrase;
+                for(let i=0; i<document.getElementsByClassName("phrase-clef").length; i++) {
+                    document.getElementsByClassName("phrase-clef")[i].innerHTML = key_phrase;
+                }
+
+
             });
+
+            function cardToPlayChosen() {
+                if(counter) {
+                    document.getElementById("message-server").innerHTML = "Tu ne vas pas donner 2 cartes !";
+                } else {
+                    if(document.getElementsByClassName("carte-choisie").length==0){
+                        document.getElementById("message-server").innerHTML = "N'oublie pas de sélectionner une carte d'abord !";
+                    } else {
+                        let carte = document.getElementsByClassName("carte-choisie")[0];
+                        let src = carte.src;
+                        socket.emit('guesser_card_to_play', src);
+                    }
+                }
+            }
 
             function sendVote() {
                 if(counter) {
