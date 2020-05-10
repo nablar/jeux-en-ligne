@@ -27,12 +27,18 @@
                 socket.emit('pseudo', pseudo);
             }
 
-            // On affiche une boîte de dialogue quand le serveur nous envoie un "message"
+            // redirection to the waiting room after sending the pseudo
+            socket.on('redirect', function(destination) {
+                window.location.href = destination;
+            });
+
+
+            // Message d'erreur
             socket.on('message', function(message) {
-                document.getElementById("message-server").innerHTML = 'Le serveur a un message pour vous : ' + message;
-                setTimeout(function() {
+                document.getElementById("message-server").innerHTML = message;
+                /*setTimeout(function() {
                     document.getElementById("message-server").innerHTML = ''; 
-                }, 1000);
+                }, 1000);*/
                 
             })
 
