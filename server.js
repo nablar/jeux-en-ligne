@@ -8,8 +8,8 @@ const server = require('http').Server(app);
 // Chargement de socket.io
 const io = require('socket.io')(server);
 
-var players = [];
-var chef; 
+let players = [];
+let chef; 
 
 app.use(express.static('cartes'));
 // Chargement du fichier pseudo.html affiché au client
@@ -39,16 +39,18 @@ io.sockets.on('connection', function (socket, pseudo) {
         var pseudo_ok = check_pseudo(pseudo);
         if(pseudo_ok) {
           console.log(pseudo + " vient de se connecter.");
+          
           if(players.length == 0){
             chef = pseudo;
+            socket.emit('leader');
           }
           players.push(pseudo);
-          // On signale aux autres clients qu'il y a un nouveau venu
-          socket.broadcast.emit('new_player', pseudo);
+
           socket.emit('change_view', "B");
-          /* TESTING PLATEAU */
-          socket.emit('change_view', "C");
-          socket.emit('tirage', gestionCartes.tirerCartes(6));
+          socket.emit('players_list', players);
+          // On signale aux autres clients qu'il y a un nouveau venu
+          socket.broadcast.emit('players_list', players);
+          
           
         }
         else {
@@ -59,7 +61,25 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     socket.on('disconnect', function(){
     	console.log(socket.pseudo + " vient de se déconnecter.");
-    })
+      let index;
+      for(var i = 0 ; i < players.length ; i++) {
+        if(socket.pseudo == players[i]) {
+          index=i;
+        }
+      }
+      players.splice(index,1);
+      socket.broadcast.emit('players_list', players);
+
+      if(socket.pseudo==chef) {
+        chef = players[0];
+        socket.broadcast.emit('new_leader', chef);
+        console.log("le nouveau chef est " + chef);
+      }
+    });
+
+    socket.on('log-message', function(message) {
+      console.log(message)
+    });
 
 });
 
