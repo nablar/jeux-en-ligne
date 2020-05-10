@@ -64,9 +64,8 @@
         <div id="vue-A" class="current-view vue">
             <h1>Bienvenue sur le jeu Dixit !</h1>
 
-            <p>Choisis ton pseudo</p>
+            <h2>Choisis ton pseudo</h2>
             <p>
-                <label for="pseudo">Pseudo</label>
                 <input type="text" id="pseudo-input" name="pseudo" placeholder="Pseudo">
                 <input type="submit" value="Valider" onclick="sendPseudo()"/>
             </p> 
@@ -76,10 +75,9 @@
 
         <!-- VUE B : salle d'attente -->
         <div id="vue-B" class="vue">
-            <h1>Vive le Dixit !</h1>
-            <p>Attendons que tout le monde soit prêt...</p>
+            <h1 id="pseudo"></h1>
+            <h2>Attendons que tout le monde soit prêt...</h2>
             
-            <div id="pseudo"></div>
             <div class="chef">Tu es le chef du groupe, c'est à toi de décider quand commencer (attends que tout le monde soit là...)</div>
             </br>
 
@@ -96,13 +94,12 @@
 
         <!-- VUE C : voir ses cartes -->
         <div id="vue-C" class="vue">
-            <div class="counter"></div>
+            <h1 class="counter"></h1>
 
             <h1 id="inst-with-keyphrase" class="hide-if-counter" style="display:none">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>" ?</h1>
 
             <div id="phrase-clef-input" class="hide-if-not-counter">
-                <label for="phrase-clef">Phrase clef</label>
-                <input type="text" name="phrase-clef" placeholder="phrase-clef">
+                <input type="text" name="phrase-clef" placeholder="Ta phrase">
                 <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
             </div>
 
@@ -166,7 +163,7 @@
             function sendPseudo() {
                 pseudo = document.getElementById("pseudo-input").value;
                 socket.emit('pseudo', pseudo);
-                document.getElementById("pseudo").innerHTML = "Hello " + pseudo;
+                document.getElementById("pseudo").innerHTML = "Bienvenue " + pseudo + " !";
                 console.log("send the pseudo");
             }
 
