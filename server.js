@@ -20,9 +20,7 @@ const doOnConnect = function(req, res) {
 const server = http.createServer(doOnConnect);
 */
 
-
-
-
+const gestionCartes = require('./gestion_cartes');
 const http = require('http');
 const fs = require('fs');
 
