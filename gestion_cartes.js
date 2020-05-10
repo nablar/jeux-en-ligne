@@ -1,4 +1,5 @@
 const cartesDossier = './cartes';
+const cartesDossierNoRel = cartesDossier.replace('./', '')+'/';
 const fs = require('fs');
 
 /** Variables globales **/
@@ -9,8 +10,8 @@ let defausse = []
 /** Charge les noms des fichiers dans le tableau "cartes" **/
 function chargerCartes(){
 	fs.readdirSync(cartesDossier).forEach(file => { // Lire les noms des fichiers de manière synchrone
-		cartes.push(file);
-		pile.push(file);
+		cartes.push(cartesDossierNoRel+file);
+		pile.push(cartesDossierNoRel+file);
 	});
 	cartes.sort(function(a, b){return a.split(".")[0] - b.split(".")[0]}) // Trier le tableau par ordre numérique
 	pile.sort(function(a, b){return a.split(".")[0] - b.split(".")[0]}) // Trier le tableau par ordre numérique
