@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Dixit</title>
+    </head>
+ 
+    <body>
+        <style>
+            div{
+                display:none;
+            }
+            div.current-view, div.message-serveur{
+                display:block;
+            }
+    </style>
+        <!-- VUE A : choix du pseudo -->
+        <div id="vue-A" class="current-view">
+            <h1>Bienvenue sur le jeu Dixit !</h1>
+
+            <p>Choisis ton pseudo</p>
+            <p>
+                <label for="pseudo">Pseudo</label>
+                <input type="text" id="pseudo-input" name="pseudo" placeholder="Pseudo">
+                <input type="submit" value="Valider" onclick="sendPseudo()"/>
+            </p> 
+        </div>
+
+        <!-- VUE B : salle d'attente -->
+        <div id="vue-B">
+             <p>Attendons que tout le monde soit prêt !</p>
+        
+            <div id="pseudo"></div>
+
+            <div id="players"> En ligne : 
+            <ul id="ul-list">
+            <%
+                for(var i = 0 ; i < players.length ; i++) {
+            %>
+            
+                <li> <%= players[i] %> </li>
+
+            <% } %>
+            </ul>
+            </div>
+        </div>
+
+
+        <div id="message-server"></div>
+
+
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io.connect('http://localhost:50000');
+
+            function sendPseudo() {
+                var pseudo = document.getElementById("pseudo-input").value;
+                socket.emit('pseudo', pseudo);
+            }
+
+            socket.on('change_view', function(view) {
+                document.getElementsByClassName("current-view")[0].classList.remove("current-view");
+                document.getElementById("vue-"+view).classList.add("current-view");
+
+            })
+
+
+            // Message d'erreur
+            socket.on('message', function(message) {
+                document.getElementById("message-server").innerHTML = message;
+                /*setTimeout(function() {
+                    document.getElementById("message-server").innerHTML = ''; 
+                }, 1000);*/
+                
+            })
+
+        </script>
+    </body>
+</html>
