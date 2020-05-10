@@ -1,12 +1,12 @@
 const http = require('http');
 const fs = require('fs');
 const express = require('express');
+const gestionCartes = require('./gestion_cartes');
 
 const app = require('express')();
 const server = require('http').Server(app);
 // Chargement de socket.io
 const io = require('socket.io')(server);
-
 
 var players = [];
 var chef; 
