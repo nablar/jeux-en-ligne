@@ -7,6 +7,16 @@ const server = require('http').Server(app);
 // Chargement de socket.io
 const io = require('socket.io')(server);
 
+const session = require('express-session') ({
+  secret:'dixit',
+  resave:true,
+  saveUninitialized:true
+})
+
+const sharedsession = require("express-socket.io-session");
+
+app.use(session);
+
 var players = [];
 var chef; 
 
@@ -23,12 +33,16 @@ app.get('/waiting_room', function(req, res) {
 });
 
 
+io.use(sharedsession(session, { 
+  autoSave:true
+}));
 
 io.sockets.on('connection', function (socket, pseudo) {
 
     // Dès qu'on nous donne un pseudo, on le stocke en variable de session
     socket.on('pseudo', function(pseudo) {
-        socket.pseudo = pseudo;
+        socket.handshake.session.pseudo = pseudo;
+        socket.handshake.session.save();
         var pseudo_ok = check_pseudo(pseudo);
         if(pseudo_ok) {
           console.log(pseudo + " vient de se connecter.");
@@ -49,11 +63,11 @@ io.sockets.on('connection', function (socket, pseudo) {
     });
 
     socket.on('ask_pseudo', function(){
-      socket.emit('send_pseudo', socket.pseudo);
+      socket.emit('send_pseudo', socket.handshake.session.pseudo);
     })
 
     socket.on('disconnect', function(){
-    	console.log(socket.pseudo + " vient de se déconnecter.");
+    	console.log(socket.handshake.session.pseudo + " vient de se déconnecter.");
     })
 
 });
