@@ -11,6 +11,8 @@ const io = require('socket.io')(server);
 let players = [];
 let chef; 
 let index_counter;
+let guesses={};
+let scores={};
 //let welcom = true;  //welcom = true if new gamers are welcomed, = false if the game already started
 
 app.use(express.static('cartes'));
@@ -110,6 +112,22 @@ io.sockets.on('connection', function (socket, pseudo) {
     	gestionCartes.defausserCartes(a_defausser);
     });
 
+    socket.on('counter_choice', function(card, key_phrase) {
+      socket.emit('change_view', "D");
+      socket.broadcast.emit('change_view', "D");
+
+      socket.emit('reveal_counter_choice', card, key_phrase);
+      socket.broadcast.emit('reveal_counter_choice', card, key_phrase);
+    });
+
+    socket.on('guesser_choice', function(pseudo, card) {
+      guesses[pseudo]=card;
+      if(Object.keys(dictionary).length==players.length){
+        computeScores();
+        socket.emit('change_view', "E");
+        socket.emit('scores', scores);
+      }
+    })
 });
 
 

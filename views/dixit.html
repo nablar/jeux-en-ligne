@@ -36,7 +36,10 @@
                 border-radius: 20px;
                 box-shadow: 0px 0px 25px 5px green;
             }
-    </style>
+        </style>
+
+        <div id="message-server"></div>
+
         <!-- VUE A : choix du pseudo -->
         <div id="vue-A" class="current-view vue">
             <h1>Bienvenue sur le jeu Dixit !</h1>
@@ -105,6 +108,9 @@
         <!-- VUE D : voir les cartes sur le plateau -->
         <div id="vue-D" class="vue">
             <h1>Selon toi, quelle carte correspond à "<span id="phrase-clef"></span>" ?</h1>
+            <div class="vote-except-counter">
+                <input type="submit" value="Voter" onclick="sendVote()"/>
+            </div>
 
             <div class="cards-container">
                 <table>
@@ -114,15 +120,25 @@
             </div>
         </div>
 
+        <!-- VUE E : scores -->
+        <div id="vue-E" class="vue">
+            <h1>Voici les scores</h1>
+            
+            <div class="scores">
+                
+            </div>
+        </div>
 
-        <div id="message-server"></div>
+        
 
 
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
             let socket = io.connect('http://localhost:50000');
+            console.log(socket);
             let pseudo;
+            let counter=false;
 
             function sendPseudo() {
                 pseudo = document.getElementById("pseudo-input").value;
@@ -154,7 +170,7 @@
                     li.appendChild(document.createTextNode(list[i]));
                     ul.appendChild(li);
                 }
-            })
+            });
             /*
             socket.on('leader', function() {
                 for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
@@ -193,13 +209,45 @@
             socket.on('counter', function(pseudo_counter) {
                 let c = document.getElementsByClassName("counter")[0];
                 if(pseudo==pseudo_counter) {
+                    counter=true;
                     c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase."
                     document.getElementsByClassName("hide-if-not-counter")[0].classList.remove("hide-if-not-counter");
                     
                 } else {
+                    counter=false;
                     c.innerHTML = "Le conteur est : " + pseudo_counter + ". Attends qu'il ait choisi sa carte."
                 }
             })
+
+
+            function sendKeyPhrase(){
+                if(document.getElementsByClassName("carte-choisie").length==0){
+                    document.getElementById("message-server").innerHTML = "N'oublie pas de sélectionner une carte d'abord !";
+                } else {
+                    let carte = document.getElementsByClassName("carte-choisie")[0];
+                    let src = carte.src;
+                    key_phrase = document.getElementById("phrase-clef-input").value;
+                    socket.emit('counter_choice', src, key_phrase);
+                }
+            }
+
+            socket.on('reveal_counter_choice', function(card, key_phrase) {
+                document.getElementById("phrase-clef").innerHTML = key_phrase;
+            });
+
+            function sendVote() {
+                if(counter) {
+                    document.getElementById("message-server").innerHTML = "Tu ne peux pas voter, petit tricheur !";
+                } else {
+                    if(document.getElementsByClassName("carte-choisie").length==0){
+                        document.getElementById("message-server").innerHTML = "N'oublie pas de sélectionner une carte d'abord !";
+                    } else {
+                        let carte = document.getElementsByClassName("carte-choisie-d")[0];
+                        let src = carte.src;
+                        socket.emit('guesser_choice', pseudo, src);
+                    }
+                }
+            }
 
             function cardSelected(id){
                 if(document.getElementsByClassName("carte-choisie").length>0){
