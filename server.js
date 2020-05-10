@@ -11,12 +11,23 @@ const io = require('socket.io')(server);
 let players = [];
 let chef; 
 
+app.use(express.static('cartes'));
 // Chargement du fichier pseudo.html affiché au client
 app.get('/', function(req, res) {
-    fs.readFile('views/dixit.html', 'utf-8', function(error, content) {
+    fs.readFile('views/dixit.html', function(error, content) {
+    	if(error) throw error;
         res.writeHead(200, {"Content-Type": "text/html"});
         res.end(content);
     });
+})
+.get('/cartes/:nom', function(req, res){
+	if(req.params.nom.match(/^[0-9]+\.png$/g)){
+		console.log("carte "+req.params.nom+" demandée");
+		fs.readFile('cartes/'+req.params.nom, function(error, content) {
+			res.writeHead(200, {"Content-Type": "image/png"});
+			res.end(content);
+		});
+	}
 });
 
 
