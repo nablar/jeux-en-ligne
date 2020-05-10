@@ -126,6 +126,7 @@ io.sockets.on('connection', function (socket, pseudo) {
         socket.emit('change_view', "D");
         socket.broadcast.emit('change_view', "D");
         socket.emit('start_guessing', players.length, a_defausser);
+        socket.broadcast.emit('start_guessing', players.length, a_defausser);
       }
     })
 

@@ -3,10 +3,34 @@
     <head>
         <meta charset="utf-8" />
         <title>Dixit</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
  
     <body>
         <style>
+            body{
+                font-family: sans-serif;
+                background: #0B3861;
+                color:white;
+                text-align: center;
+            }
+            input{
+                padding:5px;
+                border-radius:5px;
+            }
+            input[type=submit]{
+                background-color:#210B61;
+                color:white;
+                border-color:#240B3B;
+            }
+            ul#online-players{
+                font-weight: bold;
+                list-style: none;
+                padding:0;
+            }
+            ul#online-players span{
+                color:yellow;
+            }
             div.vue{
                 display:none;
             }
@@ -22,7 +46,7 @@
             div.hide-if-not-counter{
                 display:none;
             }
-            th{
+            td{
                 width:30%;
                 height: 50%;
             }
@@ -31,7 +55,7 @@
                 height:auto;
                 border: 5px hidden green;
             }
-            img.carte-choisie{
+            img.carte-choisie, img.carte-choisie-d{
                 border:5px solid green;
                 border-radius: 20px;
                 box-shadow: 0px 0px 25px 5px green;
@@ -64,7 +88,7 @@
             </br>
 
             <div id="players"> En ligne : 
-                <ul id="ul-list"> </ul>
+                <ul id="online-players"></ul>
             </div>
 
             <div class="chef">
@@ -93,14 +117,14 @@
                 <table>
                     <tbody>
                         <tr>
-                            <th><img id="carte0" class="carte" onclick="cardSelected(this.id)"></th>
-                            <th><img id="carte1" class="carte" onclick="cardSelected(this.id)"></th>
-                            <th><img id="carte2" class="carte" onclick="cardSelected(this.id)"></th>
+                            <td><img id="carte0" class="carte" onclick="cardSelected(this.id)"></td>
+                            <td><img id="carte1" class="carte" onclick="cardSelected(this.id)"></td>
+                            <td><img id="carte2" class="carte" onclick="cardSelected(this.id)"></td>
                         </tr>
                         <tr>
-                            <th><img id="carte3" class="carte" onclick="cardSelected(this.id)"></th>
-                            <th><img id="carte4" class="carte" onclick="cardSelected(this.id)"></th>
-                            <th><img id="carte5" class="carte" onclick="cardSelected(this.id)"></th>
+                            <td><img id="carte3" class="carte" onclick="cardSelected(this.id)"></td>
+                            <td><img id="carte4" class="carte" onclick="cardSelected(this.id)"></td>
+                            <td><img id="carte5" class="carte" onclick="cardSelected(this.id)"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -163,15 +187,20 @@
 
             // Liste des joueurs
             socket.on('players_list', function(list) {
-                let ul = document.getElementById("ul-list");
+                let ul = document.getElementById("online-players");
                 
                 while (ul.hasChildNodes()) {  
                     ul.removeChild(ul.firstChild);
                 }
 
                 for (let i=0; i<list.length ; i++) {
-                    var li = document.createElement("li");
+                    let li = document.createElement("li");
                     li.appendChild(document.createTextNode(list[i]));
+                    if(i==0){ // icône de chef
+                        let span = document.createElement("span");
+                        span.innerHTML = "👑";
+                        li.appendChild(span);
+                    }
                     ul.appendChild(li);
                 }
             });
@@ -282,12 +311,17 @@
                 document.getElementById(id).classList.add("carte-choisie");
             }
 
+            function cardSelectedD(id){
+                if(document.getElementsByClassName("carte-choisie-d").length>0){
+                    document.getElementsByClassName("carte-choisie-d")[0].classList.remove("carte-choisie-d");
+                }
+                document.getElementById(id).classList.add("carte-choisie-d");
+            }
+
+
             function populatePlateau(nbJoueurs, cartes){
                 // 3 cartes par ligne
-                nbLignes = Math.floor(nbJoueurs/3);
-                if(nbJoueurs%3 != 0){
-                    nbLignes += 1;
-                }
+                nbLignes = Math.ceil(nbJoueurs/3);
                 tableau = document.getElementById("plateau");
                 for(let i = 0 ; i < nbLignes ; i++){
                     ligne = document.createElement("tr");
@@ -295,12 +329,14 @@
                         if(3*i+j == nbJoueurs){
                             break;
                         }
-                        carte = document.createElement("img");
+                        let carte = document.createElement("img");
                         carte.src = cartes[3*i+j];
                         carte.classList.add("carte")
                         carte.id = "carte"+i+"-"+j;
-                        carte.onclick = "cardSelected(this.id)";
-                        ligne.appendChild(carte);
+                        carte.setAttribute('onClick', "cardSelectedD(this.id)");
+                        let td = document.createElement("td");
+                        td.appendChild(carte);
+                        ligne.appendChild(td);
                     }
                     tableau.appendChild(ligne);
                 }
