@@ -81,3 +81,4 @@ exports.getPile = getPile;
 exports.tirerCartes = tirerCartes;
 exports.defausserCartes = defausserCartes;
 exports.getDefausse = getDefausse;
+exports.tirerCarte = tirerCarte;
