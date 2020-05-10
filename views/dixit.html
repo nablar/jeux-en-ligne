@@ -19,9 +19,6 @@
             div.current-chef{
                 display:block;
             }
-            div.hide-if-not-counter{
-                display:none;
-            }
             th{
                 width:30%;
                 height: 50%;
@@ -76,18 +73,17 @@
 
         <!-- VUE C : voir ses cartes -->
         <div id="vue-C" class="vue">
-            <!--<h1>Voici ton jeu ! Choisis une carte.</h1>-->
             <div class="counter"></div>
 
-            <h1>Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>" ?</h1>
+            <h1 id="inst-with-keyphrase" class="hide-if-counter" style="display:none">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>" ?</h1>
 
-            <div class="hide-if-not-counter">
+            <div id="phrase-clef-input" class="hide-if-not-counter">
                 <label for="phrase-clef">Phrase clef</label>
-                <input type="text" id="phrase-clef-input" name="phrase-clef" placeholder="phrase-clef">
+                <input type="text" name="phrase-clef" placeholder="phrase-clef">
                 <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
             </div>
 
-            <input id="choose-card-to-play" type="submit" value="Valider" onclick="cardToPlayChosen()"/>
+            <input id="choose-card-to-play" style="display:none" class="hide-if-counter" type="submit" value="Valider" onclick="cardToPlayChosen()"/>
 
             <div class="cards-container">
                 <table>
@@ -111,8 +107,8 @@
 
         <!-- VUE D : voir les cartes sur le plateau -->
         <div id="vue-D" class="vue">
-            <h1>Selon toi, quelle carte correspond à "<span class="phrase-clef"></span>" ?</h1>
             <div class="vote-except-counter">
+                <h1>Selon toi, quelle carte correspond à "<span class="phrase-clef"></span>" ?</h1>
                 <input type="submit" value="Voter" onclick="sendVote()"/>
             </div>
 
@@ -148,6 +144,7 @@
                 pseudo = document.getElementById("pseudo-input").value;
                 socket.emit('pseudo', pseudo);
                 document.getElementById("pseudo").innerHTML = "Hello " + pseudo;
+                console.log("send the pseudo");
             }
 
 
@@ -215,17 +212,23 @@
                 if(pseudo==pseudo_counter) {
                     counter=true;
                     c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase."
-                    document.getElementsByClassName("hide-if-not-counter")[0].classList.remove("hide-if-not-counter");
-                    document.getElementById("choose-card-to-play").parentNode.removeChild(document.getElementById("choose-card-to-play"));
+                    
+                    for(let i=0; i<document.getElementsByClassName("hide-if-counter").length; i++) {
+                        let to_remove = document.getElementsByClassName("hide-if-counter")[i];
+                        to_remove.parentNode.removeChild(to_remove);
+                    }
                 } else {
+                    for(let i=0; i<document.getElementsByClassName("hide-if-not-counter").length; i++) {
+                        let to_remove = document.getElementsByClassName("hide-if-not-counter")[i];
+                        to_remove.parentNode.removeChild(to_remove);
+                    }
+                    
                     counter=false;
                     c.innerHTML = "Le conteur est : " + pseudo_counter + ". Attends qu'il ait choisi sa carte."
                 }
             });
 
-            socket.on('start_guessing', function(nbJoueurs, cartes){
-                populatePlateau(nbJoueurs, cartes);
-            });
+            
 
 
             function sendKeyPhrase(){
@@ -243,7 +246,17 @@
                 for(let i=0; i<document.getElementsByClassName("phrase-clef").length; i++) {
                     document.getElementsByClassName("phrase-clef")[i].innerHTML = key_phrase;
                 }
-
+                if(counter) {
+                    let to_remove = document.getElementById("phrase-clef-input");
+                    to_remove.parentNode.removeChild(to_remove);
+                    document.getElementsByClassName("counter")[0].innerHTML="Tes camarades sont en train de choisir leurs cartes.";
+                } else {
+                    let to_display = document.getElementById("inst-with-keyphrase");
+                    to_display.style="";
+                    let to_display_b = document.getElementById("choose-card-to-play");
+                    to_display_b.style="";
+                    document.getElementsByClassName("counter")[0].innerHTML="";                    
+                }
 
             });
 
@@ -261,12 +274,18 @@
                 }
             }
 
+            socket.on('start_guessing', function(nbJoueurs, cartes){
+                populatePlateau(nbJoueurs, cartes);
+            });
+
+            
+
             function sendVote() {
                 if(counter) {
-                    document.getElementById("message-server").innerHTML = "Tu ne peux pas voter, petit tricheur !";
+                    display_short_message("Tu ne peux pas voter, petit tricheur !");
                 } else {
                     if(document.getElementsByClassName("carte-choisie").length==0){
-                        document.getElementById("message-server").innerHTML = "N'oublie pas de sélectionner une carte d'abord !";
+                        display_short_message("N'oublie pas de sélectionner une carte d'abord !");
                     } else {
                         let carte = document.getElementsByClassName("carte-choisie-d")[0];
                         let src = carte.src;
@@ -304,6 +323,13 @@
                     }
                     tableau.appendChild(ligne);
                 }
+            }
+
+            function display_short_message(message) {
+                document.getElementById("message-server").innerHTML = message;
+                setTimeout(function() {
+                    document.getElementById("message-server").innerHTML = ''; 
+                }, 1000);
             }
         </script>
     </body>
