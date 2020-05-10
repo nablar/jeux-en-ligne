@@ -31,6 +31,8 @@ app.get('/', function(req, res) {
 });
 
 
+
+a_defausser = [];
 io.sockets.on('connection', function (socket, pseudo) {
 
     // Dès qu'on nous donne un pseudo, on le stocke en variable de session
@@ -88,10 +90,18 @@ io.sockets.on('connection', function (socket, pseudo) {
     });
 
     socket.on('tirage', function(){
-      socket.emit('tirage', gestionCartes.tirerCartes(6));
-    })
+    	socket.main = gestionCartes.tirerCartes(6);
+      socket.emit('tirage', socket.main);
+    });
 
+    socket.on('choix_carte', function(carte){
+    	a_defausser.push(carte);
+    	socket.carte_choisie = carte;
+    });
 
+    socket.on('defausser', function(){
+    	gestionCartes.defausserCartes(a_defausser);
+    });
 
 });
 
