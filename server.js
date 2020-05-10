@@ -8,8 +8,8 @@ const server = require('http').Server(app);
 // Chargement de socket.io
 const io = require('socket.io')(server);
 
-var players = [];
-var chef; 
+let players = [];
+let chef; 
 
 // Chargement du fichier pseudo.html affiché au client
 app.get('/', function(req, res) {
@@ -28,13 +28,17 @@ io.sockets.on('connection', function (socket, pseudo) {
         var pseudo_ok = check_pseudo(pseudo);
         if(pseudo_ok) {
           console.log(pseudo + " vient de se connecter.");
+          
           if(players.length == 0){
             chef = pseudo;
           }
           players.push(pseudo);
-          // On signale aux autres clients qu'il y a un nouveau venu
-          socket.broadcast.emit('new_player', pseudo);
+
           socket.emit('change_view', "B");
+          socket.emit('players_list', players);
+          // On signale aux autres clients qu'il y a un nouveau venu
+          socket.broadcast.emit('players_list', players);
+          
           
         }
         else {
@@ -45,7 +49,19 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     socket.on('disconnect', function(){
     	console.log(socket.pseudo + " vient de se déconnecter.");
-    })
+      let index;
+      for(var i = 0 ; i < players.length ; i++) {
+        if(socket.pseudo == players[i]) {
+          index=i;
+        }
+      }
+      players.splice(index,1);
+      socket.broadcast.emit('players_list', players);
+    });
+
+    socket.on('log-message', function(message) {
+      console.log(message)
+    });
 
 });
 

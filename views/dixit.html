@@ -7,15 +7,15 @@
  
     <body>
         <style>
-            div{
+            div.vue{
                 display:none;
             }
-            div.current-view, div.message-serveur{
+            div.current-view{
                 display:block;
             }
     </style>
         <!-- VUE A : choix du pseudo -->
-        <div id="vue-A" class="current-view">
+        <div id="vue-A" class="current-view vue">
             <h1>Bienvenue sur le jeu Dixit !</h1>
 
             <p>Choisis ton pseudo</p>
@@ -26,22 +26,17 @@
             </p> 
         </div>
 
+
+
         <!-- VUE B : salle d'attente -->
-        <div id="vue-B">
-             <p>Attendons que tout le monde soit prêt !</p>
+        <div id="vue-B" class="vue">
+            <h1>Vive le Dixit !</h1>
+            <p>Attendons que tout le monde soit prêt...</p>
         
-            <div id="pseudo"></div>
+            <div id="pseudo"></div> </br>
 
             <div id="players"> En ligne : 
-            <ul id="ul-list">
-            <%
-                for(var i = 0 ; i < players.length ; i++) {
-            %>
-            
-                <li> <%= players[i] %> </li>
-
-            <% } %>
-            </ul>
+                <ul id="ul-list"> </ul>
             </div>
         </div>
 
@@ -57,13 +52,54 @@
             function sendPseudo() {
                 var pseudo = document.getElementById("pseudo-input").value;
                 socket.emit('pseudo', pseudo);
+                document.getElementById("pseudo").innerHTML = "Hello " + pseudo;
             }
 
+
             socket.on('change_view', function(view) {
+                document.getElementById("message-server").innerHTML = "";
                 document.getElementsByClassName("current-view")[0].classList.remove("current-view");
                 document.getElementById("vue-"+view).classList.add("current-view");
 
             })
+
+            // Liste des joueurs
+            socket.on('players_list', function(list) {
+                let ul = document.getElementById("ul-list");
+                
+                while (ul.hasChildNodes()) {  
+                    ul.removeChild(ul.firstChild);
+                }
+
+                for (let i=0; i<list.length ; i++) {
+                    var li = document.createElement("li");
+                    li.appendChild(document.createTextNode(list[i]));
+                    ul.appendChild(li);
+                }
+            })
+
+            /*
+            // Mise à jour de la liste des joueurs
+            socket.on('new_player', function(pseudo) {
+                var ul = document.getElementById("ul-list");
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(pseudo));
+                ul.appendChild(li);
+            })
+
+            socket.on('disconnection', function(pseudo) {
+                var ul = document.getElementById("ul-list");
+
+                for(let i=0 ; i<ul.childNodes.length; i++) {
+                    li=ul.childNodes[i];
+
+                    if(li.innerHTML==pseudo) {
+                        ul.removeChild(li);
+                        break;
+                    }
+                }
+            })*/
+
 
 
             // Message d'erreur
