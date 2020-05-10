@@ -62,7 +62,7 @@
             </div>
 
             <div class="chef">
-                <input type="submit" value="Commencer" onclick="start_game()"/>
+                <input type="submit" value="Commencer" onclick="socket.emit('start_game');"/>
             </div>
         </div>
 
@@ -119,6 +119,9 @@
                 document.getElementById("message-server").innerHTML = "";
                 document.getElementsByClassName("current-view")[0].classList.remove("current-view");
                 document.getElementById("vue-"+view).classList.add("current-view");
+                if(view==='C'){
+                    socket.emit('tirage');
+                }
 
             })
 
@@ -152,30 +155,6 @@
                     }
                 }
             });
-
-            /*
-            // Mise à jour de la liste des joueurs
-            socket.on('new_player', function(pseudo) {
-                var ul = document.getElementById("ul-list");
-                var li = document.createElement("li");
-                li.appendChild(document.createTextNode(pseudo));
-                ul.appendChild(li);
-            })
-
-            socket.on('disconnection', function(pseudo) {
-                var ul = document.getElementById("ul-list");
-
-                for(let i=0 ; i<ul.childNodes.length; i++) {
-                    li=ul.childNodes[i];
-
-                    if(li.innerHTML==pseudo) {
-                        ul.removeChild(li);
-                        break;
-                    }
-                }
-            })*/
-
-
 
             // Message d'erreur
             socket.on('message', function(message) {

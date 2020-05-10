@@ -77,9 +77,21 @@ io.sockets.on('connection', function (socket, pseudo) {
       }
     });
 
+    socket.on('start_game', function() {
+      socket.emit('change_view', "C");
+      socket.broadcast.emit('change_view', "C");
+    });
+
+
     socket.on('log-message', function(message) {
       console.log(message)
     });
+
+    socket.on('tirage', function(){
+      socket.emit('tirage', gestionCartes.tirerCartes(6));
+    })
+
+
 
 });
 
