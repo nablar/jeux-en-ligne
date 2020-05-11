@@ -112,6 +112,7 @@ io.sockets.on('connection', function (socket, pseudo) {
     });
 
     socket.on('counter_choice', function(card, key_phrase) {
+    	card = cleanCardName(card);
       chosen_cards[counter] = card;
       a_defausser.push(card);
       
@@ -120,11 +121,15 @@ io.sockets.on('connection', function (socket, pseudo) {
     });
 
     socket.on('guesser_card_to_play', function(card) {
+    	card = cleanCardName(card);
       chosen_cards[socket.pseudo]=card;
       a_defausser.push(card);
       if(Object.keys(chosen_cards).length==players.length){
         socket.emit('change_view', "D");
         socket.broadcast.emit('change_view', "D");
+        console.log(a_defausser);
+        a_defausser = shuffle(a_defausser); // On mélange les cartes pour brouiller les pistes
+        console.log(a_defausser);
         socket.emit('start_guessing', players.length, a_defausser);
         socket.broadcast.emit('start_guessing', players.length, a_defausser);
       } else {
@@ -134,6 +139,7 @@ io.sockets.on('connection', function (socket, pseudo) {
     })
 
     socket.on('guesser_choice', function(pseudo, card) {
+    	card = cleanCardName(card);
       guesses[pseudo]=card;
       if(Object.keys(guesses).length == players.length-1){
         computeScores();
@@ -168,4 +174,28 @@ function next_counter() {
 
 function computeScores(){
   
+}
+
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+function cleanCardName(cardName){ // Garder seulement le chemin relatif vers l'image de la carte
+	let re = new RegExp(".*(?="+gestionCartes.dossierCartes+")");
+	return cardName.replace(re, '');
 }
