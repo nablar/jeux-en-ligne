@@ -10,7 +10,11 @@ const io = require('socket.io')(server);
 
 let players = [];
 let chef; 
+let counter;
 let index_counter;
+let chosen_cards={};
+let guesses={};
+let scores={};
 //let welcom = true;  //welcom = true if new gamers are welcomed, = false if the game already started
 
 app.use(express.static('cartes'));
@@ -24,7 +28,6 @@ app.get('/', function(req, res) {
 })
 .get('/cartes/:nom', function(req, res){
 	if(req.params.nom.match(/^[0-9]+\.png$/g)){
-		console.log("carte "+req.params.nom+" demandée");
 		fs.readFile('cartes/'+req.params.nom, function(error, content) {
 			res.writeHead(200, {"Content-Type": "image/png"});
 			res.end(content);
@@ -87,6 +90,7 @@ io.sockets.on('connection', function (socket, pseudo) {
       socket.emit('change_view', "C");
       socket.broadcast.emit('change_view', "C");
       index_counter = 0;
+      counter=socket.pseudo;
       socket.emit('counter', socket.pseudo);
       socket.broadcast.emit('counter', socket.pseudo);
     });
@@ -101,15 +105,42 @@ io.sockets.on('connection', function (socket, pseudo) {
       socket.emit('tirage', socket.main);
     });
 
-    socket.on('choix_carte', function(carte){
-    	a_defausser.push(carte);
-    	socket.carte_choisie = carte;
-    });
+
 
     socket.on('defausser', function(){
     	gestionCartes.defausserCartes(a_defausser);
     });
 
+    socket.on('counter_choice', function(card, key_phrase) {
+      chosen_cards[counter] = card;
+      a_defausser.push(card);
+      
+      socket.emit('reveal_counter_choice', card, key_phrase);
+      socket.broadcast.emit('reveal_counter_choice', card, key_phrase);
+    });
+
+    socket.on('guesser_card_to_play', function(card) {
+      chosen_cards[socket.pseudo]=card;
+      a_defausser.push(card);
+      if(Object.keys(chosen_cards).length==players.length){
+        socket.emit('change_view', "D");
+        socket.broadcast.emit('change_view', "D");
+        socket.emit('start_guessing', players.length, a_defausser);
+        socket.broadcast.emit('start_guessing', players.length, a_defausser);
+      } else {
+        socket.emit('card_received');
+      }
+
+    })
+
+    socket.on('guesser_choice', function(pseudo, card) {
+      guesses[pseudo]=card;
+      if(Object.keys(guesses).length == players.length-1){
+        computeScores();
+        socket.emit('change_view', "E");
+        socket.emit('scores', scores);
+      }
+    })
 });
 
 
@@ -132,5 +163,9 @@ function check_pseudo(pseudo) {
 
 function next_counter() {
   index_counter = (index_counter + 1) % players.length;
-  return players[index_counter];
+  counter=players[index_counter];
+}
+
+function computeScores(){
+  
 }
