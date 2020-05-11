@@ -34,6 +34,18 @@ app.get('/', function(req, res) {
 			res.end(content);
 		});
 	}
+})
+.get('/js/dixit.js', function(req, res){
+  fs.readFile('./js/dixit.js', function(error, content) {
+      res.writeHead(200, {"Content-Type": "text/javascript"});
+      res.end(content);
+    });
+})
+.get('/css/dixit.css', function(req, res){
+  fs.readFile('./css/dixit.css', function(error, content) {
+      res.writeHead(200, {"Content-Type": "text/css"});
+      res.end(content);
+    });
 });
 
 
@@ -144,16 +156,20 @@ io.sockets.on('connection', function (socket, pseudo) {
       console.log(pseudo +" a choisi la carte  " + card);
       
       if(Object.keys(guesses).length == players.length-1){
-        scores = computeScores();
-
         socket.emit('show_votes', players, counter, chosen_cards, guesses);
         socket.broadcast.emit('show_votes', players, counter, chosen_cards, guesses);
-        /*
-        socket.emit('change_view', "E");
-        socket.emit('scores', scores);
-        */
       }
     })
+
+    socket.on('reveal_total_scores', function() {
+        scores = computeScores();
+        socket.emit('change_view', "E");
+        socket.broadcast.emit('change_view', "E");
+        socket.emit('scores', scores);
+        socket.broadcast.emit('scores', scores);
+    })
+
+
 });
 
 
