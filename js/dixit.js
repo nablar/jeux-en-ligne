@@ -24,6 +24,7 @@ socket.on('change_view', function(view) {
         resetChosenCards(); // réinitialiser les cartes choisies
         clearPlateau(); // supprimer les cartes du tour précédent
         clearScoresTable(); // supprimer les scores du tour précédent
+        resetConfirmationMessage(); // Réinitialiser le message de confirmation
     }
 
 })
@@ -365,3 +366,6 @@ function clearScoresTable(){
     table.parentNode.removeChild(table);
 }
 
+function resetConfirmationMessage(){
+    document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : \"<span class=\"phrase-clef\"></span>\"";
+}
