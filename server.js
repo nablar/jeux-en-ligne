@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const express = require('express');
 const gestionCartes = require('./gestion_cartes');
+const gestionScores = require('./gestion_scores');
 
 const app = require('express')();
 const server = require('http').Server(app);
@@ -14,7 +15,7 @@ let counter;
 let index_counter;
 let chosen_cards={};
 let guesses={};
-let scores={};
+let scores;
 //let welcom = true;  //welcom = true if new gamers are welcomed, = false if the game already started
 
 app.use(express.static('cartes'));
@@ -127,9 +128,7 @@ io.sockets.on('connection', function (socket, pseudo) {
       if(Object.keys(chosen_cards).length==players.length){
         socket.emit('change_view', "D");
         socket.broadcast.emit('change_view', "D");
-        console.log(a_defausser);
         a_defausser = shuffle(a_defausser); // On mélange les cartes pour brouiller les pistes
-        console.log(a_defausser);
         socket.emit('start_guessing', players.length, a_defausser);
         socket.broadcast.emit('start_guessing', players.length, a_defausser);
       } else {
@@ -142,7 +141,7 @@ io.sockets.on('connection', function (socket, pseudo) {
     	card = cleanCardName(card);
       guesses[pseudo]=card;
       if(Object.keys(guesses).length == players.length-1){
-        computeScores();
+        scores = computeScores();
         socket.emit('change_view', "E");
         socket.emit('scores', scores);
       }
@@ -173,7 +172,8 @@ function next_counter() {
 }
 
 function computeScores(){
-  
+  scores = gestionScores.computeScores(players, guesses, chosen_cards, counter, scores);
+  return scores;
 }
 
 function shuffle(array) {

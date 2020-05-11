@@ -59,6 +59,17 @@
             div.cards-container{
                 margin-top:50px;
             }
+            div.scores table{
+                margin: 0 auto;
+                border-collapse: collapse;
+            }
+            #scores-table td, #scores-table th{
+                padding:20px;
+                border: 1px solid white;
+            }
+            #scores-table td{
+                font-weight: normal;
+            }
         </style>
 
         <div id="message-server"></div>
@@ -148,9 +159,11 @@
         <!-- VUE E : scores -->
         <div id="vue-E" class="vue">
             <h1>Voici les scores</h1>
-            
+            <p class="hide-if-not-chef">
+                <input type="submit" value="Tour suivant !" onclick="socket.emit('nextTurn');"/>
+            </p>
             <div class="scores">
-                
+                <table><tbody id="scores-table"></tbody></table>
             </div>
         </div>
 
@@ -315,7 +328,7 @@
                 if(counter) {
                     display_short_message("Tu ne peux pas voter, petit tricheur !");
                 } else {
-                    if(document.getElementsByClassName("carte-choisie").length==0){
+                    if(document.getElementsByClassName("carte-choisie-d").length==0){
                         display_short_message("N'oublie pas de sélectionner une carte d'abord !");
                     } else {
                         let carte = document.getElementsByClassName("carte-choisie-d")[0];
@@ -369,6 +382,24 @@
                     document.getElementById("message-server").innerHTML = ''; 
                 }, 1000);
             }
+
+
+            socket.on("scores", function(scores){
+                //scores = scores.sort(function(first, second) { return second[1] - first[1]; });
+                let table = document.getElementById("scores-table");
+                let players_row = document.createElement("tr");
+                let scores_row = document.createElement("tr");
+                for(let player in scores){
+                    let th = document.createElement("th");
+                    let td = document.createElement("th");
+                    th.innerHTML = player;
+                    td.innerHTML = scores[player];
+                    players_row.appendChild(th);
+                    scores_row.appendChild(td);
+                }
+                table.appendChild(players_row);
+                table.appendChild(scores_row);
+            });
         </script>
     </body>
 </html>
