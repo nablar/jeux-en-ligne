@@ -127,7 +127,10 @@ io.sockets.on('connection', function (socket, pseudo) {
         socket.broadcast.emit('change_view', "D");
         socket.emit('start_guessing', players.length, a_defausser);
         socket.broadcast.emit('start_guessing', players.length, a_defausser);
+      } else {
+        socket.emit('card_received');
       }
+
     })
 
     socket.on('guesser_choice', function(pseudo, card) {
@@ -161,4 +164,8 @@ function check_pseudo(pseudo) {
 function next_counter() {
   index_counter = (index_counter + 1) % players.length;
   counter=players[index_counter];
+}
+
+function computeScores(){
+  
 }

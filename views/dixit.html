@@ -127,10 +127,12 @@
 
         <!-- VUE D : voir les cartes sur le plateau -->
         <div id="vue-D" class="vue">
-            <div class="vote-except-counter">
+            <div class="hide-if-counter">
+                <h1>Passons aux votes !</h1>
                 <h1>Selon toi, quelle carte correspond à "<span class="phrase-clef"></span>" ?</h1>
                 <input type="submit" value="Voter" onclick="sendVote()"/>
             </div>
+            <h1><span class="hide-if-not-counter">Les autres joueurs sont en train de voter !</span></h1>
 
             <div class="cards-container">
                 <table>
@@ -155,7 +157,7 @@
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            let socket = io.connect('http://localhost:50000');
+            let socket = io.connect(document.location.href);
             let pseudo;
             let counter=false;
 
@@ -232,22 +234,19 @@
 
             socket.on('counter', function(pseudo_counter) {
                 let c = document.getElementsByClassName("counter")[0];
+                let list_name;
                 if(pseudo==pseudo_counter) {
                     counter=true;
-                    c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase."
-                    
-                    for(let i=0; i<document.getElementsByClassName("hide-if-counter").length; i++) {
-                        let to_remove = document.getElementsByClassName("hide-if-counter")[i];
-                        to_remove.parentNode.removeChild(to_remove);
-                    }
+                    c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase.";
+                    list_name = "hide-if-counter"; 
                 } else {
-                    for(let i=0; i<document.getElementsByClassName("hide-if-not-counter").length; i++) {
-                        let to_remove = document.getElementsByClassName("hide-if-not-counter")[i];
-                        to_remove.parentNode.removeChild(to_remove);
-                    }
-                    
+                    list_name = "hide-if-not-counter"; 
                     counter=false;
                     c.innerHTML = "Le conteur est : " + pseudo_counter + ". Attends qu'il ait choisi sa carte."
+                }
+                while(document.getElementsByClassName(list_name).length > 0){
+                    let to_remove = document.getElementsByClassName(list_name)[0];
+                    to_remove.parentNode.removeChild(to_remove);
                 }
             });
 
@@ -296,6 +295,12 @@
                     }
                 }
             }
+
+            socket.on('card_received', function() {
+                document.getElementById("inst-with-keyphrase").innerHTML="Bien noté ! Attendons les autres joueurs..."
+                let to_hide = document.getElementById("choose-card-to-play");
+                to_hide.style="display:none";
+            });
 
             socket.on('start_guessing', function(nbJoueurs, cartes){
                 populatePlateau(nbJoueurs, cartes);
