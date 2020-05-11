@@ -46,7 +46,7 @@
                 width:30%;
                 height: 50%;
             }
-            img.carte{                        
+            img.carte, img.carte-d{                        
                 width:90%;
                 height:auto;
                 border: 5px hidden #ccddff;
@@ -55,6 +55,11 @@
                 border:5px solid #ccddff;
                 border-radius: 26px;
                 box-shadow: 0px 0px 25px 5px #ccddff;
+            }
+            img.reveal-counter-card{
+                border:5px solid #d40d0d;
+                border-radius: 26px;
+                box-shadow: 0px 0px 25px 5px #d40d0d;
             }
             div.cards-container{
                 margin-top:50px;
@@ -130,12 +135,13 @@
 
         <!-- VUE D : voir les cartes sur le plateau -->
         <div id="vue-D" class="vue">
-            <div class="hide-if-counter">
+            <div class="hide-if-counter hide-after-vote">
                 <h1>Passons aux votes !</h1>
                 <h1>Selon toi, quelle carte correspond à "<span class="phrase-clef"></span>" ?</h1>
                 <input type="submit" value="Voter" onclick="sendVote()"/>
             </div>
-            <h1><span class="hide-if-not-counter">Les autres joueurs sont en train de voter !</span></h1>
+            <h1><span class="hide-if-not-counter hide-after-vote">Les autres joueurs sont en train de voter !</span></h1>
+            <h1 id="title-after-vote"></h1>
 
             <div class="cards-container">
                 <table>
@@ -163,6 +169,7 @@
             let socket = io.connect(document.location.href);
             let pseudo;
             let counter=false;
+            let chosen_card_to_play;
 
             function sendPseudo() {
                 pseudo = document.getElementById("pseudo-input").value;
@@ -253,8 +260,6 @@
                 }
             });
 
-            
-
 
             function sendKeyPhrase(){
                 if(document.getElementsByClassName("carte-choisie").length==0){
@@ -293,8 +298,8 @@
                         document.getElementById("message-server").innerHTML = "N'oublie pas de sélectionner une carte d'abord !";
                     } else {
                         let carte = document.getElementsByClassName("carte-choisie")[0];
-                        let src = carte.src;
-                        socket.emit('guesser_card_to_play', src);
+                        chosen_card_to_play = carte.src;
+                        socket.emit('guesser_card_to_play', chosen_card_to_play);
                     }
                 }
             }
@@ -315,15 +320,90 @@
                 if(counter) {
                     display_short_message("Tu ne peux pas voter, petit tricheur !");
                 } else {
-                    if(document.getElementsByClassName("carte-choisie").length==0){
+                    if(document.getElementsByClassName("carte-choisie-d").length==0){
                         display_short_message("N'oublie pas de sélectionner une carte d'abord !");
                     } else {
                         let carte = document.getElementsByClassName("carte-choisie-d")[0];
                         let src = carte.src;
-                        socket.emit('guesser_choice', pseudo, src);
+
+                        if (chosen_card_to_play == src){
+                            display_short_message("Tu ne peux pas voter pour ta propre carte, petit tricheur !");
+                        } else {
+                            socket.emit('guesser_choice', pseudo, src);
+                            console.log("le choix de " + pseudo + " est : " + src);
+                        }                        
                     }
                 }
             }
+
+
+
+            socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, guesses) {
+                //Change title
+                while(document.getElementsByClassName("hide-after-vote").length > 0){
+                    let to_remove = document.getElementsByClassName("hide-after-vote")[0];
+                    to_remove.parentNode.removeChild(to_remove);
+                }
+                document.getElementById("title-after-vote").innerHTML = "Voici les résultats des votes";
+
+                //Remove selection halo around card
+                if(document.getElementsByClassName("carte-choisie-d")>0) {
+                    let card_selected = document.getElementsByClassName("carte-choisie-d")[0];
+                    card_selected.parentNode.removeChild(card_selected);
+                }
+                
+                
+
+                //Show results of votes 
+                let card_list = document.getElementsByClassName("carte-d");
+                for(let i=0; i<players_list.length; i++){
+                    let name = players_list[i];
+                    if(name==counter_pseudo) { // the teller didn't vote
+                        continue;
+                    }
+                    let card = guesses[name];
+
+                    for(let j=0; j<card_list.length; j++) {
+
+                        if(card_list[j].src == card) {
+                            var newDiv = document.createElement("div");
+                            var newContent = document.createTextNode(name);
+                            newDiv.appendChild(newContent);
+                              
+                            card_list[j].parentNode.insertBefore(newDiv, card_list[j].nextSibling);
+                            break;
+                        }
+                    }
+                }
+
+                //Show who chose the cards
+                for(let i=0; i<players_list.length; i++){
+                    let name = players_list[i];
+                    let card = chosen_cards[name];
+
+                    console.log("nom du joueur " + name);
+                    console.log("carte du joueur " + card);
+
+                    for(let j=0; j<card_list.length; j++) {
+
+                        if(card_list[j].src == card) {
+                            var newDiv = document.createElement("div");
+                            var newContent = document.createTextNode("Carte de " + name);
+                            newDiv.appendChild(newContent);
+                              
+                            card_list[j].parentNode.insertBefore(newDiv, card_list[j]);
+
+                            //Add selection halo around counter card
+                            if(name==counter_pseudo) {
+                                card_list[j].classList.add("reveal-counter-card");
+                            }
+                            break;
+                        }
+                    }
+                }
+
+
+            })
 
             function cardSelected(id){
                 if(document.getElementsByClassName("carte-choisie").length>0){
@@ -352,7 +432,7 @@
                         }
                         let carte = document.createElement("img");
                         carte.src = cartes[3*i+j];
-                        carte.classList.add("carte")
+                        carte.classList.add("carte-d")
                         carte.id = "carte"+i+"-"+j;
                         carte.setAttribute('onClick', "cardSelectedD(this.id)");
                         let td = document.createElement("td");
