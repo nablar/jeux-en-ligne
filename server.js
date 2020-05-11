@@ -55,7 +55,7 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     // Dès qu'on nous donne un pseudo, on le stocke en variable de session
     socket.on('pseudo', function(pseudo) {
-        socket.pseudo = pseudo;
+        if(pseudo)
         var pseudo_ok = check_pseudo(pseudo);
         if(pseudo_ok) {
           console.log(pseudo + " vient de se connecter.");
@@ -179,7 +179,7 @@ server.listen(50000);
 
 
 function check_pseudo(pseudo) {
-  if(pseudo=='') {
+  if(pseudo=="" || pseudo === undefined) {
     return false;
   }
   for(var i = 0 ; i < players.length ; i++) {
