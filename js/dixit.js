@@ -1,6 +1,7 @@
 let socket = io.connect(document.location.href);
 let pseudo;
 let counter=false;
+let leader=false;
 let chosen_card_to_play;
 
 function sendPseudo() {
@@ -39,34 +40,27 @@ socket.on('players_list', function(list) {
         ul.appendChild(li);
     }
 });
-/*
-socket.on('leader', function() {
-    for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
-        document.getElementsByClassName("chef")[i].classList.add("current-chef");
-    }
-}); */
 
-socket.on('new_leader', function(pseudo_chef) {
-    if(pseudo_chef==pseudo) {
-        socket.emit('log-message', "Je suis le nouveau chef : " + pseudo);
-        for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
-            document.getElementsByClassName("chef")[i].classList.add("current-chef");
+
+socket.on('new_leader', function(pseudo_leader) {
+    if(pseudo_leader==pseudo) {
+        leader=true;
+        socket.emit('log-message', "Je suis le nouveau leader : " + pseudo);
+        while(document.getElementsByClassName("hide-if-leader").length > 0){
+            let to_remove = document.getElementsByClassName("hide-if-leader")[0];
+            to_remove.parentNode.removeChild(to_remove);
         }
     } else {
-        for(let i=0; i<document.getElementsByClassName("chef").length; i++) {
-            document.getElementsByClassName("chef")[i].classList.remove("current-chef");
+        leader=false;
+        while(document.getElementsByClassName("hide-if-not-leader").length > 0){
+            let to_remove = document.getElementsByClassName("hide-if-not-leader")[0];
+            to_remove.parentNode.removeChild(to_remove);
         }
+
     }
 });
 
-// Message d'erreur
-socket.on('message', function(message) {
-    document.getElementById("message-server").innerHTML = message;
-    /*setTimeout(function() {
-        document.getElementById("message-server").innerHTML = ''; 
-    }, 1000);*/
-    
-})
+
 
 socket.on('tirage', function(cartes){
     for (var i = 0; i < cartes.length; i++) {
@@ -95,7 +89,7 @@ socket.on('counter', function(pseudo_counter) {
 
 function sendKeyPhrase(){
     if(document.getElementsByClassName("carte-choisie").length==0){
-        document.getElementById("message-server").innerHTML = "N'oublie pas de sélectionner une carte d'abord !";
+        display_short_message("N'oublie pas de sélectionner une carte d'abord !");
     } else {
         let carte = document.getElementsByClassName("carte-choisie")[0];
         let src = carte.src;
@@ -111,7 +105,7 @@ socket.on('reveal_counter_choice', function(card, key_phrase) {
     if(counter) {
         let to_remove = document.getElementById("phrase-clef-input");
         to_remove.parentNode.removeChild(to_remove);
-        document.getElementsByClassName("counter")[0].innerHTML="Tes camarades sont en train de choisir leurs cartes.";
+        document.getElementsByClassName("counter")[0].innerHTML="Les autres joueurs sont en train de choisir leurs cartes.";
     } else {
         let to_display = document.getElementById("inst-with-keyphrase");
         to_display.style="";
@@ -124,10 +118,10 @@ socket.on('reveal_counter_choice', function(card, key_phrase) {
 
 function cardToPlayChosen() {
     if(counter) {
-        document.getElementById("message-server").innerHTML = "Tu ne vas pas donner 2 cartes !";
+        display_short_message("Tu ne vas pas donner 2 cartes !");
     } else {
         if(document.getElementsByClassName("carte-choisie").length==0){
-            document.getElementById("message-server").innerHTML = "N'oublie pas de sélectionner une carte d'abord !";
+            display_short_message("N'oublie pas de sélectionner une carte d'abord !");
         } else {
             let carte = document.getElementsByClassName("carte-choisie")[0];
             chosen_card_to_play = carte.src;
@@ -193,8 +187,10 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
     }
     
     //Show button to reveal scores for the leader
-    document.getElementById("reveal-total-scores-button").style="";
-
+    if(leader) {
+        document.getElementById("reveal-total-scores-button").style="";
+    }
+    
     //Show results of votes 
     let card_list = document.getElementsByClassName("carte-d");
     for(let i=0; i<players_list.length; i++){
@@ -205,13 +201,12 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
     let card = guesses[name];
 
     for(let j=0; j<card_list.length; j++) {
-
-        if(card_list[j].src == card) {
+        if(card_list[j].src.endsWith(card)) {
             var newDiv = document.createElement("div");
             var newContent = document.createTextNode(name);
             newDiv.appendChild(newContent);
-            
             card_list[j].parentNode.insertBefore(newDiv, card_list[j].nextSibling);
+            console.log("Votes ajoutés ");
             break;
         }
     }
@@ -222,16 +217,13 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
         let name = players_list[i];
         let card = chosen_cards[name];
 
-        console.log("nom du joueur " + name);
-        console.log("carte du joueur " + card);
-
         for(let j=0; j<card_list.length; j++) {
 
-            if(card_list[j].src == card) {
+            if(card_list[j].src.endsWith(card)) {
                 var newDiv = document.createElement("div");
                 var newContent = document.createTextNode("Carte de " + name);
                 newDiv.appendChild(newContent);
-                
+
                 card_list[j].parentNode.insertBefore(newDiv, card_list[j]);
 
                 //Add selection halo around counter card
@@ -309,14 +301,6 @@ function populatePlateau(nbJoueurs, cartes){
     }
 }
 
-function display_short_message(message) {
-    document.getElementById("message-server").innerHTML = message;
-    setTimeout(function() {
-        document.getElementById("message-server").innerHTML = ''; 
-    }, 1000);
-}
-
-
 socket.on("scores", function(scores){
     //scores = scores.sort(function(first, second) { return second[1] - first[1]; });
     let table = document.getElementById("scores-table");
@@ -333,3 +317,20 @@ socket.on("scores", function(scores){
     table.appendChild(players_row);
     table.appendChild(scores_row);
 });
+
+
+
+
+// Message du serveur
+socket.on('message', function(message) {
+    display_short_message(message);
+})
+
+function display_short_message(message) {
+    document.getElementById("message-server").innerHTML = message;
+    setTimeout(function() {
+        document.getElementById("message-server").innerHTML = ''; 
+    }, 1000);
+}
+
+

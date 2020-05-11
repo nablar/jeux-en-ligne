@@ -55,7 +55,7 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     // Dès qu'on nous donne un pseudo, on le stocke en variable de session
     socket.on('pseudo', function(pseudo) {
-        socket.pseudo = pseudo;
+        if(pseudo)
         var pseudo_ok = check_pseudo(pseudo);
         if(pseudo_ok) {
           console.log(pseudo + " vient de se connecter.");
@@ -82,30 +82,33 @@ io.sockets.on('connection', function (socket, pseudo) {
     });
 
     socket.on('disconnect', function(){
-    	console.log(socket.pseudo + " vient de se déconnecter.");
-      let index;
-      for(var i = 0 ; i < players.length ; i++) {
-        if(socket.pseudo == players[i]) {
-          index=i;
+      if(socket.pseudo !== undefined) {
+        console.log(socket.pseudo + " vient de se déconnecter.");
+        let index;
+        for(var i = 0 ; i < players.length ; i++) {
+          if(socket.pseudo == players[i]) {
+            index=i;
+          }
+        }
+        players.splice(index,1);
+        socket.broadcast.emit('players_list', players);
+
+        if(socket.pseudo==chef) {
+          chef = players[0];
+          socket.broadcast.emit('new_leader', chef);
+          console.log("le nouveau chef est " + chef);
         }
       }
-      players.splice(index,1);
-      socket.broadcast.emit('players_list', players);
-
-      if(socket.pseudo==chef) {
-        chef = players[0];
-        socket.broadcast.emit('new_leader', chef);
-        console.log("le nouveau chef est " + chef);
-      }
+    	
     });
 
     socket.on('start_game', function() {
       socket.emit('change_view', "C");
       socket.broadcast.emit('change_view', "C");
       index_counter = 0;
-      counter=socket.pseudo;
-      socket.emit('counter', socket.pseudo);
-      socket.broadcast.emit('counter', socket.pseudo);
+      counter=chef;
+      socket.emit('counter', counter);
+      socket.broadcast.emit('counter', counter);
     });
 
 
@@ -183,7 +186,7 @@ server.listen(50000);
 
 
 function check_pseudo(pseudo) {
-  if(pseudo=='') {
+  if(pseudo=="" || pseudo === undefined) {
     return false;
   }
   for(var i = 0 ; i < players.length ; i++) {
