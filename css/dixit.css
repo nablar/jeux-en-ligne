@@ -49,14 +49,15 @@ img.reveal-counter-card{
 div.cards-container{
     margin-top:50px;
 }
-div.scores table{
+div.scores table, table.round-scores-table{
     margin: 0 auto;
     border-collapse: collapse;
+    margin-bottom:50px;
 }
-#scores-table td, #scores-table th{
+#scores-table td, #scores-table th, #round-scores td, #round-scores th{
     padding:20px;
     border: 1px solid white;
 }
-#scores-table td{
+#scores-table td, #round-scores td{
     font-weight: normal;
 }
