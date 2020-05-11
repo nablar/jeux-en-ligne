@@ -56,6 +56,11 @@
                 border-radius: 26px;
                 box-shadow: 0px 0px 25px 5px #ccddff;
             }
+            img.reveal-counter-card{
+                border:5px solid #d40d0d;
+                border-radius: 26px;
+                box-shadow: 0px 0px 25px 5px #d40d0d;
+            }
             div.cards-container{
                 margin-top:50px;
             }
@@ -164,6 +169,7 @@
             let socket = io.connect(document.location.href);
             let pseudo;
             let counter=false;
+            let chosen_card_to_play;
 
             function sendPseudo() {
                 pseudo = document.getElementById("pseudo-input").value;
@@ -292,8 +298,8 @@
                         document.getElementById("message-server").innerHTML = "N'oublie pas de sélectionner une carte d'abord !";
                     } else {
                         let carte = document.getElementsByClassName("carte-choisie")[0];
-                        let src = carte.src;
-                        socket.emit('guesser_card_to_play', src);
+                        chosen_card_to_play = carte.src;
+                        socket.emit('guesser_card_to_play', chosen_card_to_play);
                     }
                 }
             }
@@ -319,8 +325,13 @@
                     } else {
                         let carte = document.getElementsByClassName("carte-choisie-d")[0];
                         let src = carte.src;
-                        socket.emit('guesser_choice', pseudo, src);
-                        console.log("le choix de " + pseudo + " est : " + src);
+
+                        if (chosen_card_to_play == src){
+                            display_short_message("Tu ne peux pas voter pour ta propre carte, petit tricheur !");
+                        } else {
+                            socket.emit('guesser_choice', pseudo, src);
+                            console.log("le choix de " + pseudo + " est : " + src);
+                        }                        
                     }
                 }
             }
@@ -340,6 +351,7 @@
                     let card_selected = document.getElementsByClassName("carte-choisie-d")[0];
                     card_selected.parentNode.removeChild(card_selected);
                 }
+                
                 
 
                 //Show results of votes 
@@ -380,6 +392,11 @@
                             newDiv.appendChild(newContent);
                               
                             card_list[j].parentNode.insertBefore(newDiv, card_list[j]);
+
+                            //Add selection halo around counter card
+                            if(name==counter_pseudo) {
+                                card_list[j].classList.add("reveal-counter-card");
+                            }
                             break;
                         }
                     }
