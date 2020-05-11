@@ -55,25 +55,21 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     // Dès qu'on nous donne un pseudo, on le stocke en variable de session
     socket.on('pseudo', function(pseudo) {
-        if(pseudo)
-        var pseudo_ok = check_pseudo(pseudo);
+        let pseudo_ok = check_pseudo(pseudo);
         if(pseudo_ok) {
+        	socket.pseudo = pseudo;
           console.log(pseudo + " vient de se connecter.");
           
           if(players.length == 0){
             chef = pseudo;
-            //socket.emit('leader');
-            socket.emit('new_leader', chef);
-            socket.broadcast.emit('new_leader', chef);
           }
+          socket.emit('new_leader', chef);
           players.push(pseudo);
 
           socket.emit('change_view', "B");
           socket.emit('players_list', players);
           // On signale aux autres clients qu'il y a un nouveau venu
           socket.broadcast.emit('players_list', players);
-          
-          
         }
         else {
           socket.emit('message', "Ce pseudo est déjà pris, choisis-en un autre.")
@@ -139,6 +135,8 @@ io.sockets.on('connection', function (socket, pseudo) {
     socket.on('guesser_card_to_play', function(card) {
     	card = cleanCardName(card);
       chosen_cards[socket.pseudo]=card;
+      console.log(socket.pseudo +" a chosi la carte "+card);
+      console.log(chosen_cards);
       a_defausser.push(card);
       if(Object.keys(chosen_cards).length==players.length){
         socket.emit('change_view', "D");
