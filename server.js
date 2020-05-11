@@ -140,10 +140,18 @@ io.sockets.on('connection', function (socket, pseudo) {
     socket.on('guesser_choice', function(pseudo, card) {
     	card = cleanCardName(card);
       guesses[pseudo]=card;
+
+      console.log(pseudo +" a choisi la carte  " + card);
+      
       if(Object.keys(guesses).length == players.length-1){
         scores = computeScores();
+
+        socket.emit('show_votes', players, counter, chosen_cards, guesses);
+        socket.broadcast.emit('show_votes', players, counter, chosen_cards, guesses);
+        /*
         socket.emit('change_view', "E");
         socket.emit('scores', scores);
+        */
       }
     })
 });
