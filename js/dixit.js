@@ -1,3 +1,7 @@
+window.onbeforeunload = function() {
+    return "Il est déconseillé d'actualiser cette page, vous allez sortir de la partie !";
+}
+
 let socket = io.connect(document.location.href);
 let pseudo;
 let counter=false;
