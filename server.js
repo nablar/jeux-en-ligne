@@ -112,8 +112,11 @@ io.sockets.on('connection', function (socket, pseudo) {
     });
 
     socket.on('tirage', function(){
-    	socket.main = gestionCartes.tirerCartes(6);
-      socket.emit('tirage', socket.main);
+    	if(!socket.main){
+    		socket.main = [];
+    	}
+  		socket.main = socket.main.concat(gestionCartes.tirerCartes(6 - socket.main.length));
+    	socket.emit('tirage', socket.main);
     });
 
 
@@ -126,7 +129,7 @@ io.sockets.on('connection', function (socket, pseudo) {
     	card = cleanCardName(card);
       chosen_cards[counter] = card;
       a_defausser.push(card);
-      
+      socket.main.splice(socket.main.indexOf(card), 1);
       socket.emit('reveal_counter_choice', card, key_phrase);
       socket.broadcast.emit('reveal_counter_choice', card, key_phrase);
     });
@@ -135,7 +138,7 @@ io.sockets.on('connection', function (socket, pseudo) {
     	card = cleanCardName(card);
       chosen_cards[socket.pseudo]=card;
       console.log(socket.pseudo +" a chosi la carte "+card);
-      console.log(chosen_cards);
+      socket.main.splice(socket.main.indexOf(card), 1);
       a_defausser.push(card);
       if(Object.keys(chosen_cards).length==players.length){
         socket.emit('change_view', "D");
@@ -191,7 +194,6 @@ io.sockets.on('connection', function (socket, pseudo) {
       // Change view
       socket.emit('change_view', "C");
       socket.broadcast.emit('change_view', "C");
-
     });
 
 

@@ -21,6 +21,9 @@ socket.on('change_view', function(view) {
     document.getElementById("vue-"+view).classList.add("current-view");
     if(view==='C'){
         socket.emit('tirage');
+        resetChosenCards(); // réinitialiser les cartes choisies
+        clearPlateau(); // supprimer les cartes du tour précédent
+        clearScoresTable(); // supprimer les scores du tour précédent
     }
 
 })
@@ -334,4 +337,31 @@ function display_short_message(message) {
     }, 1000);
 }
 
+function resetChosenCards(){
+    while(document.getElementsByClassName("carte-choisie").length > 0){
+        document.getElementsByClassName("carte-choisie")[0].classList.remove("carte-choisie");
+    }
+    while(document.getElementsByClassName("carte-choisie-d").length > 0){
+        document.getElementsByClassName("carte-choisie-d")[0].classList.remove("carte-choisie-d");
+    }
+}
+
+function clearPlateau(){
+    let plateau = document.getElementById("plateau");
+    while(plateau.hasChildNodes()){
+        plateau.removeChild(plateau.childNodes[0]);
+    }
+}
+
+function clearScoresTable(){
+    /* Tableau des scores de la partie */
+    let scores_table = document.getElementById("scores-table");
+    while(scores_table.hasChildNodes()){
+        scores_table.removeChild(scores_table.childNodes[0]);
+    }
+
+    /* Tableau des scores généraux */
+    let table = document.getElementById("round-scores");
+    table.parentNode.removeChild(table);
+}
 
