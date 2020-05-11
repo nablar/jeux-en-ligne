@@ -1,8 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const express = require('express');
-const gestionCartes = require('./gestion_cartes');
-const gestionScores = require('./gestion_scores');
+const gestionCartes = require('gestion_cartes');
+const gestionScores = require('gestion_scores');
 
 const app = require('express')();
 const server = require('http').Server(app);
@@ -167,7 +167,11 @@ io.sockets.on('connection', function (socket, pseudo) {
         socket.broadcast.emit('change_view', "E");
         socket.emit('scores', scores);
         socket.broadcast.emit('scores', scores);
-    })
+    });
+
+    socket.on('get_round_votes', function(){
+    	socket.emit('show_round_votes', computeScoresOneGame());
+    });
 
 
 });
@@ -196,8 +200,12 @@ function next_counter() {
 }
 
 function computeScores(){
-  scores = gestionScores.computeScores(players, guesses, chosen_cards, counter, scores);
+  scores = gestionScores.computeTotalScores(players, guesses, chosen_cards, counter, scores);
   return scores;
+}
+
+function computeScoresOneGame(){
+  return gestionScores.computeScoresOneGame(players, guesses, chosen_cards, counter);
 }
 
 function shuffle(array) {

@@ -184,6 +184,8 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
     }
     document.getElementById("title-after-vote").innerHTML = "Voici les résultats des votes";
 
+    socket.emit('get_round_votes');
+
     //Remove selection halo around card
     if(document.getElementsByClassName("carte-choisie-d")>0) {
         let card_selected = document.getElementsByClassName("carte-choisie-d")[0];
@@ -240,9 +242,34 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
             }
         }
     }
+});
 
+socket.on('show_round_votes', function(round_scores){
+    showRoundVotes(round_scores);
+});
 
-})
+function showRoundVotes(round_scores){    
+    let title = document.getElementById("title-after-vote");
+    let table = document.createElement("table");
+    table.id = "round-scores";
+    table.classList.add("round-scores-table");
+    let tbody = document.createElement("tbody");
+    let players_row = document.createElement("tr");
+    let scores_row = document.createElement("tr");
+    for(let player in round_scores){
+        let th = document.createElement("th");
+        let td = document.createElement("td");
+        th.innerHTML = player;
+        td.innerHTML = "+ "+round_scores[player];
+        players_row.appendChild(th);
+        scores_row.appendChild(td);
+    }
+    tbody.appendChild(players_row);
+    tbody.appendChild(scores_row);
+    table.appendChild(tbody);
+    title.parentNode.appendChild(table);
+    console.log(round_scores);
+}
 
 function cardSelected(id){
     if(document.getElementsByClassName("carte-choisie").length>0){
@@ -297,7 +324,7 @@ socket.on("scores", function(scores){
     let scores_row = document.createElement("tr");
     for(let player in scores){
         let th = document.createElement("th");
-        let td = document.createElement("th");
+        let td = document.createElement("td");
         th.innerHTML = player;
         td.innerHTML = scores[player];
         players_row.appendChild(th);
