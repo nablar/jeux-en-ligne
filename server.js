@@ -16,7 +16,6 @@ let index_counter;
 let chosen_cards={};
 let guesses={};
 let scores;
-//let welcom = true;  //welcom = true if new gamers are welcomed, = false if the game already started
 
 app.use(express.static('cartes'));
 // Chargement du fichier pseudo.html affiché au client
@@ -28,9 +27,9 @@ app.get('/', function(req, res) {
     });
 })
 .get('/cartes/:nom', function(req, res){
-	if(req.params.nom.match(/^[0-9]+\.png$/g)){
+	if(req.params.nom.match(/^[0-9]+\.jpg$/g)){
 		fs.readFile('cartes/'+req.params.nom, function(error, content) {
-			res.writeHead(200, {"Content-Type": "image/png"});
+			res.writeHead(200, {"Content-Type": "image/jpeg"});
 			res.end(content);
 		});
 	}
@@ -103,8 +102,8 @@ io.sockets.on('connection', function (socket, pseudo) {
       socket.broadcast.emit('change_view', "C");
       index_counter = 0;
       counter=chef;
-      socket.emit('counter', counter);
-      socket.broadcast.emit('counter', counter);
+      socket.emit('new_counter', counter);
+      socket.broadcast.emit('new_counter', counter);
     });
 
 
@@ -113,8 +112,11 @@ io.sockets.on('connection', function (socket, pseudo) {
     });
 
     socket.on('tirage', function(){
-    	socket.main = gestionCartes.tirerCartes(6);
-      socket.emit('tirage', socket.main);
+    	if(!socket.main){
+    		socket.main = [];
+    	}
+  		socket.main = socket.main.concat(gestionCartes.tirerCartes(6 - socket.main.length));
+    	socket.emit('tirage', socket.main);
     });
 
 
@@ -127,7 +129,7 @@ io.sockets.on('connection', function (socket, pseudo) {
     	card = cleanCardName(card);
       chosen_cards[counter] = card;
       a_defausser.push(card);
-      
+      socket.main.splice(socket.main.indexOf(card), 1);
       socket.emit('reveal_counter_choice', card, key_phrase);
       socket.broadcast.emit('reveal_counter_choice', card, key_phrase);
     });
@@ -136,7 +138,7 @@ io.sockets.on('connection', function (socket, pseudo) {
     	card = cleanCardName(card);
       chosen_cards[socket.pseudo]=card;
       console.log(socket.pseudo +" a chosi la carte "+card);
-      console.log(chosen_cards);
+      socket.main.splice(socket.main.indexOf(card), 1);
       a_defausser.push(card);
       if(Object.keys(chosen_cards).length==players.length){
         socket.emit('change_view', "D");
@@ -172,6 +174,26 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     socket.on('get_round_votes', function(){
     	socket.emit('show_round_votes', computeScoresOneGame());
+    });
+
+
+    socket.on('next_turn', function() {
+      // Re initialize card choices
+      guesses={};
+      chosen_cards={};
+
+      // Change defausse
+      gestionCartes.defausserCartes(a_defausser);
+      a_defausser=[];
+
+      // Change counter
+      next_counter();
+      socket.emit('new_counter', counter);
+      socket.broadcast.emit('new_counter', counter);
+
+      // Change view
+      socket.emit('change_view', "C");
+      socket.broadcast.emit('change_view', "C");
     });
 
 

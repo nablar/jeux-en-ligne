@@ -35,15 +35,14 @@ img.carte, img.carte-d{
     width:90%;
     height:auto;
     border: 5px hidden #ccddff;
+    border-radius: 30px;
 }
 img.carte-choisie, img.carte-choisie-d{
     border:5px solid #ccddff;
-    border-radius: 26px;
     box-shadow: 0px 0px 25px 5px #ccddff;
 }
 img.reveal-counter-card{
     border:5px solid #d40d0d;
-    border-radius: 26px;
     box-shadow: 0px 0px 25px 5px #d40d0d;
 }
 div.cards-container{

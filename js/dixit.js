@@ -21,6 +21,10 @@ socket.on('change_view', function(view) {
     document.getElementById("vue-"+view).classList.add("current-view");
     if(view==='C'){
         socket.emit('tirage');
+        resetChosenCards(); // réinitialiser les cartes choisies
+        clearPlateau(); // supprimer les cartes du tour précédent
+        clearScoresTable(); // supprimer les scores du tour précédent
+        resetConfirmationMessage(); // Réinitialiser le message de confirmation
     }
 
 })
@@ -50,20 +54,14 @@ socket.on('new_leader', function(pseudo_leader) {
     if(pseudo_leader==pseudo) {
         leader=true;
         socket.emit('log-message', "Je suis le nouveau leader : " + pseudo);
-        while(document.getElementsByClassName("hide-if-leader").length > 0){
-            let to_remove = document.getElementsByClassName("hide-if-leader")[0];
-            to_remove.parentNode.removeChild(to_remove);
-        }
+        change_style_of_class("hide-if-leader", "display:none"); 
+        change_style_of_class("hide-if-not-leader", ""); 
     } else {
         leader=false;
-        while(document.getElementsByClassName("hide-if-not-leader").length > 0){
-            let to_remove = document.getElementsByClassName("hide-if-not-leader")[0];
-            to_remove.parentNode.removeChild(to_remove);
-        }
-
+        change_style_of_class("hide-if-not-leader", "display:none");
+        change_style_of_class("hide-if-leader", ""); 
     }
 });
-
 
 
 socket.on('tirage', function(cartes){
@@ -72,24 +70,28 @@ socket.on('tirage', function(cartes){
     }
 });
 
-socket.on('counter', function(pseudo_counter) {
+socket.on('new_counter', function(pseudo_counter) {
+    // Re initialize
+    document.getElementById("title-after-vote").innerHTML ="";
+    if(leader) {
+        change_style_of_class("show-after-vote-for-leader", "display:none");
+    }
+
     let c = document.getElementsByClassName("counter")[0];
-    let list_name;
     if(pseudo==pseudo_counter) {
         counter=true;
         c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase.";
-        list_name = "hide-if-counter"; 
+        change_style_of_class("hide-if-counter", "display:none"); 
+        change_style_of_class("hide-if-not-counter", ""); 
     } else {
-        list_name = "hide-if-not-counter"; 
+        change_style_of_class("hide-if-not-counter", "display:none"); 
+        change_style_of_class("hide-if-counter", ""); 
+        // hide before the counter chooses its card
+        change_style_of_class("hide-before-counter-choice", "display:none");  
         counter=false;
         c.innerHTML = "Le conteur est : " + pseudo_counter + ". Attends qu'il ait choisi sa carte."
     }
-    while(document.getElementsByClassName(list_name).length > 0){
-        let to_remove = document.getElementsByClassName(list_name)[0];
-        to_remove.parentNode.removeChild(to_remove);
-    }
 });
-
 
 function sendKeyPhrase(){
     if(document.getElementsByClassName("carte-choisie").length==0){
@@ -107,14 +109,10 @@ socket.on('reveal_counter_choice', function(card, key_phrase) {
         document.getElementsByClassName("phrase-clef")[i].innerHTML = key_phrase;
     }
     if(counter) {
-        let to_remove = document.getElementById("phrase-clef-input");
-        to_remove.parentNode.removeChild(to_remove);
+        document.getElementById("phrase-clef-input").style="display:none";
         document.getElementsByClassName("counter")[0].innerHTML="Les autres joueurs sont en train de choisir leurs cartes.";
     } else {
-        let to_display = document.getElementById("inst-with-keyphrase");
-        to_display.style="";
-        let to_display_b = document.getElementById("choose-card-to-play");
-        to_display_b.style="";
+        change_style_of_class("hide-before-counter-choice", "");
         document.getElementsByClassName("counter")[0].innerHTML="";                    
     }
 
@@ -162,10 +160,7 @@ function sendVote() {
                 socket.emit('guesser_choice', pseudo, src);
 
                 //Change title
-                while(document.getElementsByClassName("hide-after-vote").length > 0){
-                    let to_remove = document.getElementsByClassName("hide-after-vote")[0];
-                    to_remove.parentNode.removeChild(to_remove);
-                }
+                change_style_of_class("hide-after-vote", "display:none");
                 document.getElementById("title-after-vote").innerHTML = "Vote enregistré ! Attendons les autres joueurs...";
             }                        
         }
@@ -176,18 +171,18 @@ function sendVote() {
 
 socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, guesses) {
     //Change title
-    while(document.getElementsByClassName("hide-after-vote").length > 0){
-        let to_remove = document.getElementsByClassName("hide-after-vote")[0];
-        to_remove.parentNode.removeChild(to_remove);
+    change_style_of_class("hide-after-vote", "display:none");
+    if(leader) {
+        change_style_of_class("show-after-vote-for-leader", "");
     }
+    
     document.getElementById("title-after-vote").innerHTML = "Voici les résultats des votes";
 
     socket.emit('get_round_votes');
 
     //Remove selection halo around card
     if(document.getElementsByClassName("carte-choisie-d")>0) {
-        let card_selected = document.getElementsByClassName("carte-choisie-d")[0];
-        card_selected.parentNode.removeChild(card_selected);
+        let card_selected = document.getElementsByClassName("carte-choisie-d")[0].classList.remove("carte-choisie-d");
     }
     
     //Show button to reveal scores for the leader
@@ -323,7 +318,13 @@ socket.on("scores", function(scores){
 });
 
 
-
+function change_style_of_class(class_name, new_style) {
+    console.log(class_name);
+    for(let i=0; i<document.getElementsByClassName(class_name).length; i++){
+        console.log(document.getElementsByClassName(class_name)[i]);
+        document.getElementsByClassName(class_name)[i].style = new_style;
+    }
+}
 
 // Message du serveur
 socket.on('message', function(message) {
@@ -337,4 +338,34 @@ function display_short_message(message) {
     }, 1000);
 }
 
+function resetChosenCards(){
+    while(document.getElementsByClassName("carte-choisie").length > 0){
+        document.getElementsByClassName("carte-choisie")[0].classList.remove("carte-choisie");
+    }
+    while(document.getElementsByClassName("carte-choisie-d").length > 0){
+        document.getElementsByClassName("carte-choisie-d")[0].classList.remove("carte-choisie-d");
+    }
+}
 
+function clearPlateau(){
+    let plateau = document.getElementById("plateau");
+    while(plateau.hasChildNodes()){
+        plateau.removeChild(plateau.childNodes[0]);
+    }
+}
+
+function clearScoresTable(){
+    /* Tableau des scores de la partie */
+    let scores_table = document.getElementById("scores-table");
+    while(scores_table.hasChildNodes()){
+        scores_table.removeChild(scores_table.childNodes[0]);
+    }
+
+    /* Tableau des scores généraux */
+    let table = document.getElementById("round-scores");
+    table.parentNode.removeChild(table);
+}
+
+function resetConfirmationMessage(){
+    document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : \"<span class=\"phrase-clef\"></span>\"";
+}
