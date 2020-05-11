@@ -27,12 +27,6 @@ div.vue{
 div.current-view{
     display:block;
 }
-div.chef{
-    display:none;
-}
-div.current-chef{
-    display:block;
-}
 td{
     width:30%;
     height: 50%;
