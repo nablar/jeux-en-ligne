@@ -45,14 +45,15 @@
         <div id="vue-C" class="vue">
             <h1 class="counter"></h1>
 
-            <h1 id="inst-with-keyphrase" class="hide-if-counter" style="display:none">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>"</h1>
-
             <div id="phrase-clef-input" class="hide-if-not-counter">
                 <input type="text" id="phrase-clef-input-text" name="phrase-clef" placeholder="Ta phrase">
                 <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
             </div>
 
-            <input id="choose-card-to-play" style="display:none" class="hide-if-counter" type="submit" value="Valider" onclick="cardToPlayChosen()"/>
+
+            <h1 id="inst-with-keyphrase" class="hide-if-counter hide-before-counter-choice">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>"</h1>
+
+            <input id="choose-card-to-play" class="hide-if-counter hide-before-counter-choice" type="submit" value="Valider" onclick="cardToPlayChosen()"/>
 
             <div class="cards-container">
                 <table>
@@ -86,7 +87,7 @@
 
             <div><h1 id="title-after-vote"></h1></div>
 
-            <input id="reveal-total-scores-button" style="display:none" class="hide-if-not-leader" type="submit" value="Voir les scores" onclick="socket.emit('reveal_total_scores');"/>
+            <input id="reveal-total-scores-button" class="hide-if-not-leader show-after-vote-for-leader" type="submit" value="Voir les scores" onclick="socket.emit('reveal_total_scores');"/>
 
             <div class="cards-container">
                 <table>
@@ -100,7 +101,7 @@
         <div id="vue-E" class="vue">
             <h1>Voici les scores</h1>
             <p class="hide-if-not-leader">
-                <input type="submit" value="Tour suivant !" onclick="socket.emit('nextTurn');"/>
+                <input type="submit" value="Tour suivant !" onclick="socket.emit('next_turn');"/>
             </p>
             <div class="scores">
                 <table><tbody id="scores-table"></tbody></table>

@@ -16,7 +16,6 @@ let index_counter;
 let chosen_cards={};
 let guesses={};
 let scores;
-//let welcom = true;  //welcom = true if new gamers are welcomed, = false if the game already started
 
 app.use(express.static('cartes'));
 // Chargement du fichier pseudo.html affiché au client
@@ -103,8 +102,8 @@ io.sockets.on('connection', function (socket, pseudo) {
       socket.broadcast.emit('change_view', "C");
       index_counter = 0;
       counter=chef;
-      socket.emit('counter', counter);
-      socket.broadcast.emit('counter', counter);
+      socket.emit('new_counter', counter);
+      socket.broadcast.emit('new_counter', counter);
     });
 
 
@@ -172,6 +171,27 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     socket.on('get_round_votes', function(){
     	socket.emit('show_round_votes', computeScoresOneGame());
+    });
+
+
+    socket.on('next_turn', function() {
+      // Re initialize card choices
+      guesses={};
+      chosen_cards={};
+
+      // Change defausse
+      gestionCartes.defausserCartes(a_defausser);
+      a_defausser=[];
+
+      // Change counter
+      next_counter();
+      socket.emit('new_counter', counter);
+      socket.broadcast.emit('new_counter', counter);
+
+      // Change view
+      socket.emit('change_view', "C");
+      socket.broadcast.emit('change_view', "C");
+
     });
 
 
