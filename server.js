@@ -27,9 +27,9 @@ app.get('/', function(req, res) {
     });
 })
 .get('/cartes/:nom', function(req, res){
-	if(req.params.nom.match(/^[0-9]+\.png$/g)){
+	if(req.params.nom.match(/^[0-9]+\.jpg$/g)){
 		fs.readFile('cartes/'+req.params.nom, function(error, content) {
-			res.writeHead(200, {"Content-Type": "image/png"});
+			res.writeHead(200, {"Content-Type": "image/jpeg"});
 			res.end(content);
 		});
 	}
