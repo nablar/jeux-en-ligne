@@ -235,6 +235,33 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
     }
 });
 
+
+socket.on('final_scores', function(winner, scores) {
+    if(winner.length == 1) {
+        document.getElementById("winner-name").innerHTML="Le gagnant est " + winner[0] + " !";
+    } else {
+        winners_name=winner[0];
+        for(let i=0; i<winners.length-1; i++) {
+            winners_name += ", " + winner[i];
+        }
+        winners_name += " et " + winners[winners.length-1];
+        document.getElementById("winner-name").innerHTML="Les gagnants sont : " + winners_name;
+    }
+    
+    let ul = document.getElementById("players-scores-list");
+    
+    while (ul.hasChildNodes()) {  
+        ul.removeChild(ul.firstChild);
+    }
+
+    for (let i=0; i<scores.length ; i++) {
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode(scores[i][0] + " : " + scores[i][1] + " points"));
+        ul.appendChild(li);
+    }
+});
+
+
 socket.on('show_round_votes', function(round_scores){
     showRoundVotes(round_scores);
 });
@@ -300,7 +327,7 @@ function populatePlateau(nbJoueurs, cartes){
     }
 }
 
-socket.on("scores", function(scores){
+socket.on('scores', function(scores){
     //scores = scores.sort(function(first, second) { return second[1] - first[1]; });
     let table = document.getElementById("scores-table");
     let players_row = document.createElement("tr");
@@ -318,6 +345,7 @@ socket.on("scores", function(scores){
 });
 
 
+
 function change_style_of_class(class_name, new_style) {
     console.log(class_name);
     for(let i=0; i<document.getElementsByClassName(class_name).length; i++){
@@ -325,6 +353,8 @@ function change_style_of_class(class_name, new_style) {
         document.getElementsByClassName(class_name)[i].style = new_style;
     }
 }
+
+
 
 // Message du serveur
 socket.on('message', function(message) {
