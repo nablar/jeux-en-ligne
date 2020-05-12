@@ -10,7 +10,7 @@
         <div id="round-indication" class="reveal-after-start" style="display:none">Tour : <span id="current-round-number"></span>/<span id="total-round-number"></span></div>
         <div id="top-right-pseudo" class="reveal-after-start" style="display:none"></div>
 
-        <div id="message-server"></div>
+        <div id="snackbar"></div>
 
         <!-- VUE A : choix du pseudo -->
         <div id="vue-A" class="current-view vue">
@@ -63,7 +63,6 @@
                 <input type="text" id="phrase-clef-input-text" name="phrase-clef" placeholder="Ta phrase">
                 <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
             </div>
-
 
             <h1 id="inst-with-keyphrase" class="hide-if-counter hide-before-counter-choice">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>"</h1>
 

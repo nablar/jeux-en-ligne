@@ -19,7 +19,6 @@ function sendPseudo() {
 
 
 socket.on('change_view', function(view) {
-    document.getElementById("message-server").innerHTML = "";
     document.getElementsByClassName("current-view")[0].classList.remove("current-view");
     document.getElementById("vue-"+view).classList.add("current-view");
     if(view==='C'){
@@ -75,7 +74,7 @@ socket.on('new_leader', function(pseudo_leader) {
 function sendRoundNumber() {
     let round_number = document.getElementById("round-number-input").value;
     if(round_number<=0) {
-        display_short_message("Tu dois choisir un nombre strictement positif !");
+        display_message_snackbar("Tu dois choisir un nombre strictement positif !");
     } else {
         socket.emit("total_round_number", round_number);
     }
@@ -123,7 +122,7 @@ socket.on('new_counter', function(pseudo_counter) {
 
 function sendKeyPhrase(){
     if(document.getElementsByClassName("carte-choisie").length==0){
-        display_short_message("N'oublie pas de sélectionner une carte d'abord !");
+        display_message_snackbar("N'oublie pas de sélectionner une carte d'abord !");
     } else {
         let carte = document.getElementsByClassName("carte-choisie")[0];
         let src = carte.src;
@@ -148,10 +147,10 @@ socket.on('reveal_counter_choice', function(card, key_phrase) {
 
 function cardToPlayChosen() {
     if(counter) {
-        display_short_message("Tu ne vas pas donner 2 cartes !");
+        display_message_snackbar("Tu ne vas pas donner 2 cartes !");
     } else {
         if(document.getElementsByClassName("carte-choisie").length==0){
-            display_short_message("N'oublie pas de sélectionner une carte d'abord !");
+            display_message_snackbar("N'oublie pas de sélectionner une carte d'abord !");
         } else {
             let carte = document.getElementsByClassName("carte-choisie")[0];
             chosen_card_to_play = carte.src;
@@ -174,16 +173,16 @@ socket.on('start_guessing', function(nbJoueurs, cartes){
 
 function sendVote() {
     if(counter) {
-        display_short_message("Tu ne peux pas voter, petit tricheur !");
+        display_message_snackbar("Tu ne peux pas voter, petit tricheur !");
     } else {
         if(document.getElementsByClassName("carte-choisie-d").length==0){
-            display_short_message("N'oublie pas de sélectionner une carte d'abord !");
+            display_message_snackbar("N'oublie pas de sélectionner une carte d'abord !");
         } else {
             let carte = document.getElementsByClassName("carte-choisie-d")[0];
             let src = carte.src;
 
             if (chosen_card_to_play == src){
-                display_short_message("Tu ne peux pas voter pour ta propre carte, petit tricheur !");
+                display_message_snackbar("Tu ne peux pas voter pour ta propre carte, petit tricheur !");
             } else {
                 socket.emit('guesser_choice', pseudo, src);
 
@@ -387,14 +386,22 @@ function change_style_of_class(class_name, new_style) {
 
 // Message du serveur
 socket.on('message', function(message) {
-    display_short_message(message);
+    display_message_snackbar(message);
 })
 
-function display_short_message(message) {
-    document.getElementById("message-server").innerHTML = message;
-    setTimeout(function() {
-        document.getElementById("message-server").innerHTML = ''; 
-    }, 1000);
+
+function display_message_snackbar(message) {
+    // Get the snackbar DIV
+    let x = document.getElementById("snackbar");
+
+    // Add the "show" class to DIV 
+    x.className = "show";
+
+    // Add message
+    x.innerHTML = message;
+
+    // After 3 seconds, remove the show class from DIV and remove message
+    setTimeout(function(){ x.className = x.className.replace("show", ""); x.innerHTML = ""; }, 3000);
 }
 
 function resetChosenCards(){
