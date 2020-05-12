@@ -58,8 +58,10 @@ img.reveal-counter-card{
 div.cards-container{
     margin-top:50px;
 }
-div.scores table, table.round-scores-table{
+table{
     margin: 0 auto;
+}
+div.scores table, table.round-scores-table{
     border-collapse: collapse;
     margin-bottom:50px;
 }
