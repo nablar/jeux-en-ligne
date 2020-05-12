@@ -7,6 +7,9 @@
     </head>
 
     <body>
+        <div id="round-indication" class="reveal-after-start" style="display:none">Tour : <span id="current-round-number"></span>/<span id="total-round-number"></span></div>
+        <div id="top-right-pseudo" class="reveal-after-start" style="display:none"></div>
+
         <div id="message-server"></div>
 
         <!-- VUE A : choix du pseudo -->
@@ -112,12 +115,13 @@
         <!-- VUE E : scores -->
         <div id="vue-E" class="vue">
             <h1>Voici les scores</h1>
-            <p class="hide-if-not-leader">
-                <input type="submit" value="Tour suivant !" onclick="socket.emit('next_turn');"/>
-            </p>
             <div class="scores">
                 <table><tbody id="scores-table"></tbody></table>
             </div>
+
+            <p class="hide-if-not-leader">
+                <input type="submit" value="Tour suivant !" onclick="socket.emit('next_turn');"/>
+            </p>
         </div>
 
 

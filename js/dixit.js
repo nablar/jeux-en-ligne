@@ -7,11 +7,14 @@ let pseudo;
 let counter=false;
 let leader=false;
 let chosen_card_to_play;
+let total_round_number=3;
+let current_round_number=0;
 
 function sendPseudo() {
     pseudo = document.getElementById("pseudo-input").value;
     socket.emit('pseudo', pseudo);
     document.getElementById("pseudo").innerHTML = "Bienvenue " + pseudo + " !";
+    document.getElementById("top-right-pseudo").innerHTML = "Pseudo : " + pseudo;
 }
 
 
@@ -20,6 +23,12 @@ socket.on('change_view', function(view) {
     document.getElementsByClassName("current-view")[0].classList.remove("current-view");
     document.getElementById("vue-"+view).classList.add("current-view");
     if(view==='C'){
+        // change round number on top left
+        current_round_number += 1;
+        document.getElementById("current-round-number").innerHTML = current_round_number;
+        document.getElementById("total-round-number").innerHTML = total_round_number;
+        change_style_of_class("reveal-after-start", "");
+
         socket.emit('tirage');
         resetChosenCards(); // réinitialiser les cartes choisies
         clearPlateau(); // supprimer les cartes du tour précédent
@@ -73,6 +82,7 @@ function sendRoundNumber() {
 }
 
 socket.on('send_total_round_number', function(number) {
+    total_round_number = number;
     let round_number = document.getElementById("round-number");
     if(number==1) {
         round_number.innerHTML = number + " tour";
