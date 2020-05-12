@@ -9,6 +9,7 @@ let leader=false;
 let chosen_card_to_play;
 let total_round_number=3;
 let current_round_number=0;
+let cards_can_be_selected = true;
 
 function sendPseudo() {
     pseudo = document.getElementById("pseudo-input").value;
@@ -21,6 +22,7 @@ function sendPseudo() {
 socket.on('change_view', function(view) {
     document.getElementsByClassName("current-view")[0].classList.remove("current-view");
     document.getElementById("vue-"+view).classList.add("current-view");
+    cards_can_be_selected = true; // New view : cards can be selected again
     if(view==='C'){
         // change round number on top left
         current_round_number += 1;
@@ -33,6 +35,9 @@ socket.on('change_view', function(view) {
         clearPlateau(); // supprimer les cartes du tour précédent
         clearScoresTable(); // supprimer les scores du tour précédent
         resetConfirmationMessage(); // Réinitialiser le message de confirmation
+    }
+    else if(view === 'D' && counter){
+        cards_can_be_selected = false; // Block card selection
     }
 
 });
@@ -128,6 +133,7 @@ function sendKeyPhrase(){
         let src = carte.src;
         key_phrase = document.getElementById("phrase-clef-input-text").value;
         socket.emit('counter_choice', src, key_phrase);
+        cards_can_be_selected = false; // Block card selection
     }
 }
 
@@ -163,6 +169,7 @@ socket.on('card_received', function() {
     document.getElementById("inst-with-keyphrase").innerHTML="Bien noté ! Attendons les autres joueurs..."
     let to_hide = document.getElementById("choose-card-to-play");
     to_hide.style="display:none";
+    cards_can_be_selected = false;
 });
 
 socket.on('start_guessing', function(nbJoueurs, cartes){
@@ -189,9 +196,10 @@ function sendVote() {
                 //Change title
                 change_style_of_class("hide-after-vote", "display:none");
                 document.getElementById("title-after-vote").innerHTML = "Vote enregistré ! Attendons les autres joueurs...";
+                cards_can_be_selected = false; // Block card selection
             }                        
         }
-    }
+    }    
 }
 
 
@@ -232,7 +240,6 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
             var newContent = document.createTextNode(name);
             newDiv.appendChild(newContent);
             card_list[j].parentNode.insertBefore(newDiv, card_list[j].nextSibling);
-            console.log("Votes ajoutés ");
             break;
         }
     }
@@ -295,6 +302,7 @@ socket.on('show_round_votes', function(round_scores){
 });
 
 function showRoundVotes(round_scores){    
+    cards_can_be_selected = false; // Block card selection
     let title = document.getElementById("title-after-vote");
     let table = document.createElement("table");
     table.id = "round-scores";
@@ -314,10 +322,10 @@ function showRoundVotes(round_scores){
     tbody.appendChild(scores_row);
     table.appendChild(tbody);
     title.parentNode.appendChild(table);
-    console.log(round_scores);
 }
 
 function cardSelected(id){
+    if(!cards_can_be_selected) {return;}
     if(document.getElementsByClassName("carte-choisie").length>0){
         document.getElementsByClassName("carte-choisie")[0].classList.remove("carte-choisie");
     }
@@ -325,6 +333,7 @@ function cardSelected(id){
 }
 
 function cardSelectedD(id){
+    if(!cards_can_be_selected) {return;}
     if(document.getElementsByClassName("carte-choisie-d").length>0){
         document.getElementsByClassName("carte-choisie-d")[0].classList.remove("carte-choisie-d");
     }
@@ -375,9 +384,7 @@ socket.on('scores', function(scores){
 
 
 function change_style_of_class(class_name, new_style) {
-    console.log(class_name);
     for(let i=0; i<document.getElementsByClassName(class_name).length; i++){
-        console.log(document.getElementsByClassName(class_name)[i]);
         document.getElementsByClassName(class_name)[i].style = new_style;
     }
 }
@@ -429,7 +436,9 @@ function clearScoresTable(){
 
     /* Tableau des scores généraux */
     let table = document.getElementById("round-scores");
-    table.parentNode.removeChild(table);
+    if(table){
+        table.parentNode.removeChild(table);
+    }
 }
 
 function resetConfirmationMessage(){
