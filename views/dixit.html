@@ -28,6 +28,17 @@
             <h2>Attendons que tout le monde soit prêt...</h2>
             
             <div class="hide-if-not-leader">Tu es le chef du groupe, c'est à toi de décider quand commencer (attends que tout le monde soit là...)</div>
+            
+            <div class="hide-if-not-leader">
+                </br>
+                <label for="round-number-input">Nombre de tours</label>
+                <input type="number" min="1" max="20" id="round-number-input" name="round-number-input" value="3">
+                <input type="submit" value="Valider" onclick="sendRoundNumber()"/>
+            </div>
+            </br>
+
+            <div>Vous effectuerez <span id="round-number">3 tours</span>.</div>
+
             </br>
 
             <div id="players"> En ligne : 
@@ -97,6 +108,7 @@
             </div>
         </div>
 
+
         <!-- VUE E : scores -->
         <div id="vue-E" class="vue">
             <h1>Voici les scores</h1>
@@ -108,6 +120,16 @@
             </div>
         </div>
 
+
+        <!-- VUE F : fin de partie, scores finaux -->
+        <div id="vue-F" class="vue">
+            <h1>La partie est terminée !</h1>
+
+            <h2 id="winner-name"></h2>
+
+            <ul id="players-scores-list" style="list-style:none;"></ul>
+
+        </div>
         
 
 

@@ -16,6 +16,8 @@ let index_counter;
 let chosen_cards={};
 let guesses={};
 let scores;
+let total_rounds = 3;
+let done_rounds = 0;
 
 app.use(express.static('cartes'));
 // Chargement du fichier pseudo.html affiché au client
@@ -101,7 +103,7 @@ io.sockets.on('connection', function (socket, pseudo) {
       socket.emit('change_view', "C");
       socket.broadcast.emit('change_view', "C");
       index_counter = 0;
-      counter=chef;
+      counter = chef;
       socket.emit('new_counter', counter);
       socket.broadcast.emit('new_counter', counter);
     });
@@ -109,6 +111,14 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     socket.on('log-message', function(message) {
       console.log(message)
+    });
+
+
+    socket.on('total_round_number', function(number) {
+      console.log("Le nombre total de rounds prévu est " + number);
+      total_rounds = number;
+      socket.emit('send_total_round_number', number);
+      socket.broadcast.emit('send_total_round_number', number);
     });
 
     socket.on('tirage', function(){
@@ -165,12 +175,31 @@ io.sockets.on('connection', function (socket, pseudo) {
     })
 
     socket.on('reveal_total_scores', function() {
-        scores = computeScores();
+      // Compute scores
+      scores = computeScores();
+
+      // Check if game is finished
+      done_rounds+=1;
+      if(done_rounds==total_rounds) {
+        // Change view
+        socket.emit('change_view', "F");
+        socket.broadcast.emit('change_view', "F");
+
+        // Emit the final scores
+        let ordered_scores = get_ordered_scores();
+        let winners = get_winners(ordered_scores);
+        socket.emit('final_scores', winners, ordered_scores);
+        socket.broadcast.emit('final_scores', winners, ordered_scores);
+
+      } else {
         socket.emit('change_view', "E");
         socket.broadcast.emit('change_view', "E");
+        // Emit the scores
         socket.emit('scores', scores);
         socket.broadcast.emit('scores', scores);
+      }
     });
+
 
     socket.on('get_round_votes', function(){
     	socket.emit('show_round_votes', computeScoresOneGame());
@@ -178,22 +207,22 @@ io.sockets.on('connection', function (socket, pseudo) {
 
 
     socket.on('next_turn', function() {
-      // Re initialize card choices
-      guesses={};
-      chosen_cards={};
+        // Re initialize card choices
+        guesses={};
+        chosen_cards={};
 
-      // Change defausse
-      gestionCartes.defausserCartes(a_defausser);
-      a_defausser=[];
+        // Change defausse
+        gestionCartes.defausserCartes(a_defausser);
+        a_defausser=[];
 
-      // Change counter
-      next_counter();
-      socket.emit('new_counter', counter);
-      socket.broadcast.emit('new_counter', counter);
+        // Change counter
+        next_counter();
+        socket.emit('new_counter', counter);
+        socket.broadcast.emit('new_counter', counter);
 
-      // Change view
-      socket.emit('change_view', "C");
-      socket.broadcast.emit('change_view', "C");
+        // Change view
+        socket.emit('change_view', "C");
+        socket.broadcast.emit('change_view', "C");
     });
 
 
@@ -253,4 +282,26 @@ function shuffle(array) {
 function cleanCardName(cardName){ // Garder seulement le chemin relatif vers l'image de la carte
 	let re = new RegExp(".*(?="+gestionCartes.dossierCartes+")");
 	return cardName.replace(re, '');
+}
+
+function get_ordered_scores() {
+  let ordered_scores = Object.keys(scores).map(function(key) {
+    return [key, scores[key]];
+  });
+
+  ordered_scores.sort(function(first, second) {
+    return second[1] - first[1];
+  });
+  return ordered_scores;
+}
+
+function get_winners(ordered_scores) {
+  winners=[ordered_scores[0][0]];
+  i=1;
+  while(i<ordered_scores.length && ordered_scores[i][1]==ordered_scores[0][1]) {
+    winners.push(ordered_scores[i][0]);
+    i++;
+  }
+  console.log("Le gagnant est : " + winners);
+  return winners;
 }
