@@ -60,3 +60,7 @@ div.scores table, table.round-scores-table{
 #scores-table td, #round-scores td{
     font-weight: normal;
 }
+
+#round-number-input {
+    width: 3em;
+}

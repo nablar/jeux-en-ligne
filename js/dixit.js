@@ -27,7 +27,7 @@ socket.on('change_view', function(view) {
         resetConfirmationMessage(); // Réinitialiser le message de confirmation
     }
 
-})
+});
 
 // Liste des joueurs
 socket.on('players_list', function(list) {
@@ -60,6 +60,24 @@ socket.on('new_leader', function(pseudo_leader) {
         leader=false;
         change_style_of_class("hide-if-not-leader", "display:none");
         change_style_of_class("hide-if-leader", ""); 
+    }
+});
+
+function sendRoundNumber() {
+    let round_number = document.getElementById("round-number-input").value;
+    if(round_number<=0) {
+        display_short_message("Tu dois choisir un nombre strictement positif !");
+    } else {
+        socket.emit("total_round_number", round_number);
+    }
+}
+
+socket.on('send_total_round_number', function(number) {
+    let round_number = document.getElementById("round-number");
+    if(number==1) {
+        round_number.innerHTML = number + " tour";
+    } else {
+        round_number.innerHTML = number + " tours";
     }
 });
 

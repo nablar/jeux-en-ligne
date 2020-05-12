@@ -16,7 +16,7 @@ let index_counter;
 let chosen_cards={};
 let guesses={};
 let scores;
-let total_rounds = 1;
+let total_rounds = 3;
 let done_rounds = 0;
 
 app.use(express.static('cartes'));
@@ -103,7 +103,7 @@ io.sockets.on('connection', function (socket, pseudo) {
       socket.emit('change_view', "C");
       socket.broadcast.emit('change_view', "C");
       index_counter = 0;
-      counter=chef;
+      counter = chef;
       socket.emit('new_counter', counter);
       socket.broadcast.emit('new_counter', counter);
     });
@@ -111,6 +111,14 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     socket.on('log-message', function(message) {
       console.log(message)
+    });
+
+
+    socket.on('total_round_number', function(number) {
+      console.log("Le nombre total de rounds prévu est " + number);
+      total_rounds = number;
+      socket.emit('send_total_round_number', number);
+      socket.broadcast.emit('send_total_round_number', number);
     });
 
     socket.on('tirage', function(){
@@ -277,25 +285,13 @@ function cleanCardName(cardName){ // Garder seulement le chemin relatif vers l'i
 }
 
 function get_ordered_scores() {
-  /*
-  let keys = Object.keys(scores)
-  for (let i=0; i<keys.length; i++) {
-    list.push([keys[0], scores[key]]);
-  }*/
-
   let ordered_scores = Object.keys(scores).map(function(key) {
     return [key, scores[key]];
   });
 
-  console.log("ordered_scores before ordering " + ordered_scores);
-
   ordered_scores.sort(function(first, second) {
     return second[1] - first[1];
   });
-
-  console.log("ordered_scores[0] after ordering " + ordered_scores[0]);
-  console.log("ordered_scores[1] after ordering " + ordered_scores[1]);
-
   return ordered_scores;
 }
 

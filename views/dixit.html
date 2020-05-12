@@ -28,6 +28,17 @@
             <h2>Attendons que tout le monde soit prêt...</h2>
             
             <div class="hide-if-not-leader">Tu es le chef du groupe, c'est à toi de décider quand commencer (attends que tout le monde soit là...)</div>
+            
+            <div class="hide-if-not-leader">
+                </br>
+                <label for="round-number-input">Nombre de tours</label>
+                <input type="number" min="1" max="20" id="round-number-input" name="round-number-input" value="3">
+                <input type="submit" value="Valider" onclick="sendRoundNumber()"/>
+            </div>
+            </br>
+
+            <div>Vous effectuerez <span id="round-number">3 tours</span>.</div>
+
             </br>
 
             <div id="players"> En ligne : 
