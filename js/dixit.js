@@ -248,6 +248,7 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
 
             if(card_list[j].src.endsWith(card)) {
                 var newDiv = document.createElement("div");
+                newDiv.classList.add("show-card-owner");
                 var newContent = document.createTextNode("Carte de " + name);
                 newDiv.appendChild(newContent);
 
