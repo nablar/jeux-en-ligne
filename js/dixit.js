@@ -188,7 +188,7 @@ socket.on('new_teller', function(pseudo_teller) {
         // hide before the teller chooses its card
         change_style_of_class("hide-before-teller-choice", "display:none");  
         teller=false;
-        c.innerHTML = "Le conteur est : " + pseudo_teller + ". Attends qu'il ait choisi sa carte."
+        c.innerHTML = "Le conteur est : <span id=\"teller-pseudo\">" + pseudo_teller + "</span>. Attends qu'il ait choisi sa carte."
     }
 });
 
@@ -510,7 +510,7 @@ function clearScoresTable(){
 }
 
 function resetConfirmationMessage(){
-    document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : \"<span class=\"phrase-clef\"></span>\"";
+    document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : <span class=\"phrase-clef\"></span>";
 }
 
 function resetTellerPhrase(){
