@@ -40,8 +40,8 @@
             </div>
             </br>
 
-            <div>Vous effectuerez <span id="round-number">3 tours</span>.</div>
-            <div>Lors d'un tour, tous les joueurs auront été conteurs une fois.</div>
+            <div>Vous effectuerez <span id="round-number">3 tours</span>. <span class="tooltip">?<span class="tooltiptext">Lors d'un tour, tous les joueurs sont conteur une fois.</span></span></div>            
+            <div></div>
 
             </br>
 
@@ -65,7 +65,7 @@
                 <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
             </div>
 
-            <h1 id="inst-with-keyphrase" class="hide-if-teller hide-before-teller-choice">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>"</h1>
+            <h1 id="inst-with-keyphrase" class="hide-if-teller hide-before-teller-choice">Choisis ta carte qui se rapporte le mieux à : <span class="phrase-clef"></span></h1>
 
             <input id="choose-card-to-play" class="hide-if-teller hide-before-teller-choice" type="submit" value="Valider" onclick="cardToPlayChosen()"/>
 
@@ -94,7 +94,7 @@
             <div class="hide-if-teller hide-after-vote">
                 <h1>Passons aux votes !</h1>
                 <h1>Selon toi, quelle est la carte du conteur ? </h1> 
-                <h2>Pour rappel, la phrase contée est : "<span class="phrase-clef"></span>".</h2>
+                <h2>Pour rappel, la phrase contée est : <span class="phrase-clef"></span>.</h2>
                 <input type="submit" value="Voter" onclick="sendVote()"/>
             </div>
             <h1><span class="hide-if-not-teller hide-after-vote">Les autres joueurs sont en train de voter !</span></h1>

@@ -4,6 +4,12 @@ body{
     color:white;
     text-align: center;
 }
+#round-number, .phrase-clef, #teller-pseudo{
+    color:#1983e6;
+}
+.phrase-clef{
+    font-style: italic;
+}
 #round-indication {
     position:absolute;
     top:0;
@@ -20,6 +26,44 @@ body{
     right:0;
     left:0;
     font-weight: bold;
+}
+
+.tooltip{
+    background: #1469b8;
+    border-radius: 100%;
+    padding: 2px 7px;
+}
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 300px;
+  background-color: #1469b8;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  margin-left:15px;
+  margin-top:-15px;
+  z-index: 1;
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  right: 100%; /* To the left of the tooltip */
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #1469b8 transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 
 input{
@@ -96,7 +140,7 @@ div.scores table, table.round-scores-table{
   width: 300px; /* Set a default minimum width */
   left:50%; /* center div */
   margin-left: -150px; /* width/2 */
-  background-color: #479ceb; /* Black background color */
+  background-color: #479ceb; /* Blue background color */
   color: #fff; /* White text color */
   text-align: center; /* Centered text */
   border-radius: 6px; /* Rounded borders */
