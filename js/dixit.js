@@ -276,10 +276,10 @@ socket.on('final_scores', function(winner, scores) {
         document.getElementById("winner-name").innerHTML="Le gagnant est " + winner[0] + " !";
     } else {
         winners_name=winner[0];
-        for(let i=0; i<winners.length-1; i++) {
+        for(let i=0; i<winner.length-1; i++) {
             winners_name += ", " + winner[i];
         }
-        winners_name += " et " + winners[winners.length-1];
+        winners_name += " et " + winner[winners.length-1];
         document.getElementById("winner-name").innerHTML="Les gagnants sont : " + winners_name;
     }
     
