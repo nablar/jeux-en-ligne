@@ -219,8 +219,11 @@ function pseudo(socket, pseudo){
 
     socket.emit('change_view', "B");
     socket.emit('players_list', players);
-    // On signale aux autres clients qu'il y a un nouveau venu
+    // Send new player name to other players
     socket.broadcast.emit('players_list', players);
+
+    // Send number of rounds
+    socket.emit('send_total_round_number', total_rounds);
   }
   else {
     socket.emit('message', "Ce pseudo est déjà pris, choisis-en un autre.")
