@@ -35,12 +35,12 @@
             <div class="hide-if-not-leader">
                 </br>
                 <label for="round-number-input">Nombre de tours</label>
-                <input type="number" min="1" max="20" id="round-number-input" name="round-number-input" value="3">
-                <input type="submit" value="Valider" onclick="sendRoundNumber()"/>
+                <input type="number" min="1" max="20" id="round-number-input" name="round-number-input" value="3" onchange="sendRoundNumber()">
             </div>
             </br>
 
             <div>Vous effectuerez <span id="round-number">3 tours</span>.</div>
+            <div>Lors d'un tour, tous les joueurs auront été conteurs une fois.</div>
 
             </br>
 
@@ -57,16 +57,16 @@
 
         <!-- VUE C : voir ses cartes -->
         <div id="vue-C" class="vue">
-            <h1 class="counter"></h1>
+            <h1 class="teller"></h1>
 
-            <div id="phrase-clef-input" class="hide-if-not-counter">
+            <div id="phrase-clef-input" class="hide-if-not-teller">
                 <input type="text" id="phrase-clef-input-text" name="phrase-clef" placeholder="Ta phrase">
                 <input type="submit" value="Valider" onclick="sendKeyPhrase()"/>
             </div>
 
-            <h1 id="inst-with-keyphrase" class="hide-if-counter hide-before-counter-choice">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>"</h1>
+            <h1 id="inst-with-keyphrase" class="hide-if-teller hide-before-teller-choice">Choisis ta carte qui se rapporte le mieux à : "<span class="phrase-clef"></span>"</h1>
 
-            <input id="choose-card-to-play" class="hide-if-counter hide-before-counter-choice" type="submit" value="Valider" onclick="cardToPlayChosen()"/>
+            <input id="choose-card-to-play" class="hide-if-teller hide-before-teller-choice" type="submit" value="Valider" onclick="cardToPlayChosen()"/>
 
             <div class="cards-container">
                 <table>
@@ -90,13 +90,13 @@
 
         <!-- VUE D : voir les cartes sur le plateau -->
         <div id="vue-D" class="vue">
-            <div class="hide-if-counter hide-after-vote">
+            <div class="hide-if-teller hide-after-vote">
                 <h1>Passons aux votes !</h1>
                 <h1>Selon toi, quelle est la carte du conteur ? </h1> 
                 <h2>Pour rappel, la phrase contée est : "<span class="phrase-clef"></span>".</h2>
                 <input type="submit" value="Voter" onclick="sendVote()"/>
             </div>
-            <h1><span class="hide-if-not-counter hide-after-vote">Les autres joueurs sont en train de voter !</span></h1>
+            <h1><span class="hide-if-not-teller hide-after-vote">Les autres joueurs sont en train de voter !</span></h1>
 
             <div><h1 id="title-after-vote"></h1></div>
 
@@ -119,7 +119,7 @@
             </div>
 
             <p class="hide-if-not-leader">
-                <input type="submit" value="Tour suivant !" onclick="socket.emit('next_turn');"/>
+                <input id="next-turn-button" type="submit" value="Conteur suivant !" onclick="socket.emit('next_turn');"/>
             </p>
         </div>
 

@@ -4,12 +4,13 @@ window.onbeforeunload = function() {
 
 let socket = io.connect(document.location.href);
 let pseudo;
-let counter=false;
-let leader=false;
+let teller = false;
+let leader = false;
 let chosen_card_to_play;
-let total_round_number=3;
-let current_round_number=0;
+let total_round_number = 3;
+let current_round_number = 0;
 let cards_can_be_selected = true;
+let players_list = [];
 
 function sendPseudo() {
     pseudo = document.getElementById("pseudo-input").value;
@@ -26,7 +27,8 @@ socket.on('change_view', function(view) {
     if(view==='C'){
         // change round number on top left
         current_round_number += 1;
-        document.getElementById("current-round-number").innerHTML = current_round_number;
+        phrase_next_turn();
+        document.getElementById("current-round-number").innerHTML = Math.ceil(current_round_number/(players_list.length));
         document.getElementById("total-round-number").innerHTML = total_round_number;
         change_style_of_class("reveal-after-start", "");
 
@@ -35,15 +37,27 @@ socket.on('change_view', function(view) {
         clearPlateau(); // supprimer les cartes du tour précédent
         clearScoresTable(); // supprimer les scores du tour précédent
         resetConfirmationMessage(); // Réinitialiser le message de confirmation
+        resetTellerPhrase(); // Réinitialiser la phrase du conteur
     }
-    else if(view === 'D' && counter){
+    else if(view === 'D' && teller){
         cards_can_be_selected = false; // Block card selection
     }
-
 });
+
+function phrase_next_turn(){    
+    document.getElementById("next-turn-button").value = "Conteur suivant !";
+    if(current_round_number/players_list.length == Math.ceil(current_round_number/players_list.length)){
+        // Nouveau tour
+        document.getElementById("next-turn-button").value = "Tour suivant !";
+        if(Math.ceil((current_round_number+players_list.length)/players_list.length) == total_round_number){
+            document.getElementById("next-turn-button").value = "Dernier tour !";
+        }            
+    }
+}
 
 // Liste des joueurs
 socket.on('players_list', function(list) {
+    players_list = list;
     let ul = document.getElementById("online-players");
     
     while (ul.hasChildNodes()) {  
@@ -102,26 +116,26 @@ socket.on('tirage', function(cartes){
     }
 });
 
-socket.on('new_counter', function(pseudo_counter) {
+socket.on('new_teller', function(pseudo_teller) {
     // Re initialize
     document.getElementById("title-after-vote").innerHTML ="";
     if(leader) {
         change_style_of_class("show-after-vote-for-leader", "display:none");
     }
 
-    let c = document.getElementsByClassName("counter")[0];
-    if(pseudo==pseudo_counter) {
-        counter=true;
+    let c = document.getElementsByClassName("teller")[0];
+    if(pseudo==pseudo_teller) {
+        teller=true;
         c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase.";
-        change_style_of_class("hide-if-counter", "display:none"); 
-        change_style_of_class("hide-if-not-counter", ""); 
+        change_style_of_class("hide-if-teller", "display:none"); 
+        change_style_of_class("hide-if-not-teller", ""); 
     } else {
-        change_style_of_class("hide-if-not-counter", "display:none"); 
-        change_style_of_class("hide-if-counter", ""); 
-        // hide before the counter chooses its card
-        change_style_of_class("hide-before-counter-choice", "display:none");  
-        counter=false;
-        c.innerHTML = "Le conteur est : " + pseudo_counter + ". Attends qu'il ait choisi sa carte."
+        change_style_of_class("hide-if-not-teller", "display:none"); 
+        change_style_of_class("hide-if-teller", ""); 
+        // hide before the teller chooses its card
+        change_style_of_class("hide-before-teller-choice", "display:none");  
+        teller=false;
+        c.innerHTML = "Le conteur est : " + pseudo_teller + ". Attends qu'il ait choisi sa carte."
     }
 });
 
@@ -132,27 +146,27 @@ function sendKeyPhrase(){
         let carte = document.getElementsByClassName("carte-choisie")[0];
         let src = carte.src;
         key_phrase = document.getElementById("phrase-clef-input-text").value;
-        socket.emit('counter_choice', src, key_phrase);
+        socket.emit('teller_choice', src, key_phrase);
         cards_can_be_selected = false; // Block card selection
     }
 }
 
-socket.on('reveal_counter_choice', function(card, key_phrase) {
+socket.on('reveal_teller_choice', function(card, key_phrase) {
     for(let i=0; i<document.getElementsByClassName("phrase-clef").length; i++) {
         document.getElementsByClassName("phrase-clef")[i].innerHTML = key_phrase;
     }
-    if(counter) {
+    if(teller) {
         document.getElementById("phrase-clef-input").style="display:none";
-        document.getElementsByClassName("counter")[0].innerHTML="Les autres joueurs sont en train de choisir leurs cartes.";
+        document.getElementsByClassName("teller")[0].innerHTML="Les autres joueurs sont en train de choisir leurs cartes.";
     } else {
-        change_style_of_class("hide-before-counter-choice", "");
-        document.getElementsByClassName("counter")[0].innerHTML="";                    
+        change_style_of_class("hide-before-teller-choice", "");
+        document.getElementsByClassName("teller")[0].innerHTML="";                    
     }
 
 });
 
 function cardToPlayChosen() {
-    if(counter) {
+    if(teller) {
         display_message_snackbar("Tu ne vas pas donner 2 cartes !");
     } else {
         if(document.getElementsByClassName("carte-choisie").length==0){
@@ -179,7 +193,7 @@ socket.on('start_guessing', function(nbJoueurs, cartes){
 
 
 function sendVote() {
-    if(counter) {
+    if(teller) {
         display_message_snackbar("Tu ne peux pas voter, petit tricheur !");
     } else {
         if(document.getElementsByClassName("carte-choisie-d").length==0){
@@ -204,7 +218,7 @@ function sendVote() {
 
 
 
-socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, guesses) {
+socket.on('show_votes', function(players_list, teller_pseudo, chosen_cards, guesses) {
     //Change title
     change_style_of_class("hide-after-vote", "display:none");
     if(leader) {
@@ -229,7 +243,7 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
     let card_list = document.getElementsByClassName("carte-d");
     for(let i=0; i<players_list.length; i++){
         let name = players_list[i];
-        if(name==counter_pseudo) { // the teller didn't vote
+        if(name==teller_pseudo) { // the teller didn't vote
             continue;
     }
     let card = guesses[name];
@@ -260,9 +274,9 @@ socket.on('show_votes', function(players_list, counter_pseudo, chosen_cards, gue
 
                 card_list[j].parentNode.insertBefore(newDiv, card_list[j]);
 
-                //Add selection halo around counter card
-                if(name==counter_pseudo) {
-                    card_list[j].classList.add("reveal-counter-card");
+                //Add selection halo around teller card
+                if(name==teller_pseudo) {
+                    card_list[j].classList.add("reveal-teller-card");
                 }
                 break;
             }
@@ -276,10 +290,10 @@ socket.on('final_scores', function(winner, scores) {
         document.getElementById("winner-name").innerHTML="Le gagnant est " + winner[0] + " !";
     } else {
         winners_name=winner[0];
-        for(let i=0; i<winners.length-1; i++) {
+        for(let i=1; i<winner.length-1; i++) {
             winners_name += ", " + winner[i];
         }
-        winners_name += " et " + winners[winners.length-1];
+        winners_name += " et " + winner[winner.length-1];
         document.getElementById("winner-name").innerHTML="Les gagnants sont : " + winners_name;
     }
     
@@ -443,4 +457,8 @@ function clearScoresTable(){
 
 function resetConfirmationMessage(){
     document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : \"<span class=\"phrase-clef\"></span>\"";
+}
+
+function resetTellerPhrase(){
+    document.getElementById("phrase-clef-input-text").value = "";
 }
