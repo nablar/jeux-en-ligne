@@ -205,6 +205,23 @@ function tirage(socket){
 	socket.emit('tirage', socket.main);
 }
 
+let timer;
+let seconds_remaining = 120;
+function countdown(start){
+  seconds_remaining = start;
+  timer = setInterval(() => {
+    console.log(seconds_remaining);
+    seconds_remaining--;
+    if(seconds_remaining == -1){
+      stopCountdown();
+    }
+  }, 1000);
+}
+
+function stopCountdown(){
+  clearInterval(timer);
+}
+
 function pseudo(socket, pseudo){
   let pseudo_ok = check_pseudo(pseudo);
   if(pseudo_ok) {
@@ -270,6 +287,8 @@ exports.computeScores = computeScores;
 exports.computeScoresOneGame = computeScoresOneGame;
 exports.reset = reset;
 exports.defausser_cartes = defausser_cartes;
+exports.countdown = countdown;
+exports.stopCountdown = stopCountdown;
 
 /* Functions using socket */
 exports.next_turn = next_turn;
