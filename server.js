@@ -101,5 +101,9 @@ io.sockets.on('connection', function (socket, pseudo) {
 });
 
 
-// Ecoute sur le port 50000
-server.listen(50000);
+let port = process.env.PORT; // Nécessaire pour heroku : on ne choisit pas le port
+if (port == null || port == "") {
+	// Ecoute sur le port 50000 en tests locaux
+  port = 50000;
+}
+server.listen(port); 
