@@ -11,6 +11,8 @@ let total_round_number = 3;
 let current_round_number = 0;
 let cards_can_be_selected = true;
 let players_list = [];
+let current_view;
+let teller_chose = false;
 
 function sendPseudo() {
     pseudo = document.getElementById("pseudo-input").value;
@@ -21,10 +23,11 @@ function sendPseudo() {
 
 
 socket.on('change_view', function(view) {
+    current_view = view;
     document.getElementsByClassName("current-view")[0].classList.remove("current-view");
     document.getElementById("vue-"+view).classList.add("current-view");
     cards_can_be_selected = true; // New view : cards can be selected again
-    if(view==='C'){
+    if(view === 'C'){
         // change round number on top left
         current_round_number += 1;
         phrase_next_turn();
@@ -41,6 +44,55 @@ socket.on('change_view', function(view) {
     }
     else if(view === 'D' && teller){
         cards_can_be_selected = false; // Block card selection
+    }
+
+    // Display timer for views C and D
+    if(view === 'C' || view === 'D') {
+        document.getElementById("top-middle-timer").innerHTML = "";
+        document.getElementById("top-middle-timer").style = "";
+    } else {
+        document.getElementById("top-middle-timer").style = "display:none";
+    }
+});
+
+socket.on('timer', function(time) {
+    document.getElementById("top-middle-timer").innerHTML = time;
+    if(time <= 10){
+        document.getElementById("top-middle-timer").style.color = 'red';
+    } 
+    else {
+        document.getElementById("top-middle-timer").style.color = 'white';
+    }
+});
+
+socket.on('timeout', function() {
+    // Send first card if none selected
+    let card_to_send;
+    if(current_view === 'C') {
+        if(teller && !teller_chose) {
+            if(document.getElementsByClassName("carte-choisie").length == 0) {
+                cardSelected("carte0");   
+            }
+            sendKeyPhrase();
+        }
+        if(!teller && teller_chose) {
+            if(document.getElementsByClassName("carte-choisie").length == 0) {
+                cardSelected("carte0");   
+            }
+            cardToPlayChosen();
+        }
+    } 
+    else if(current_view === 'D' && !teller) {
+        if(document.getElementsByClassName("carte-choisie-d").length == 0) {
+            cardSelectedD("carte0-0");
+        }
+        let i = 0;
+        while(document.getElementsByClassName("carte-choisie-d")[0].src == document.getElementsByClassName("carte-choisie")[0].src) {
+            cardSelectedD("carte0-"+i);
+            i++;            
+            console.log(i);
+        }
+        sendVote();
     }
 });
 
@@ -117,6 +169,7 @@ socket.on('tirage', function(cartes){
 });
 
 socket.on('new_teller', function(pseudo_teller) {
+    teller_chose = false;
     // Re initialize
     document.getElementById("title-after-vote").innerHTML ="";
     if(leader) {
@@ -156,12 +209,13 @@ socket.on('reveal_teller_choice', function(card, key_phrase) {
         document.getElementsByClassName("phrase-clef")[i].innerHTML = key_phrase;
     }
     if(teller) {
-        document.getElementById("phrase-clef-input").style="display:none";
-        document.getElementsByClassName("teller")[0].innerHTML="Les autres joueurs sont en train de choisir leurs cartes.";
+        document.getElementById("phrase-clef-input").style = "display:none";
+        document.getElementsByClassName("teller")[0].innerHTML = "Les autres joueurs sont en train de choisir leurs cartes.";
     } else {
         change_style_of_class("hide-before-teller-choice", "");
-        document.getElementsByClassName("teller")[0].innerHTML="";                    
-    }
+        document.getElementsByClassName("teller")[0].innerHTML = "";  
+    }  
+    teller_chose = true;
 
 });
 

@@ -14,6 +14,14 @@ body{
     top:0;
     right:0;
 }
+#top-middle-timer{
+    position:fixed;
+    top:0;
+    right:0;
+    left:0;
+    font-weight: bold;
+}
+
 input{
     padding:5px;
     border-radius:5px;

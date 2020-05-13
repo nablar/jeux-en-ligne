@@ -11,11 +11,14 @@ let scores;
 let total_rounds = 3;
 let done_rounds = 0;
 let a_defausser = [];
+let timer_seconds = 120;
+let timer_seconds_teller = 180;
+let timer_seconds_vote = 180;
 
 function get_winners(ordered_scores) {
   winners=[ordered_scores[0][0]];
   i=1;
-  while(i<ordered_scores.length && ordered_scores[i][1]==ordered_scores[0][1]) {
+  while(i<ordered_scores.length && ordered_scores[i][1] == ordered_scores[0][1]) {
     winners.push(ordered_scores[i][0]);
     i++;
   }
@@ -120,6 +123,9 @@ function next_turn(socket){
   // Change view
   socket.emit('change_view', "C");
   socket.broadcast.emit('change_view', "C");
+
+  // Start timer
+  countdown(socket, timer_seconds_teller);
 }
 
 function get_round_votes(socket){
@@ -158,7 +164,8 @@ function guesser_choice(socket, pseudo, card){
 
   console.log(pseudo +" a choisi la carte  " + card);
   
-  if(Object.keys(guesses).length == players.length-1){
+  if(Object.keys(guesses).length == players.length-1){  // if everybody voted
+    stopCountdown();
     socket.emit('show_votes', players, teller, chosen_cards, guesses);
     socket.broadcast.emit('show_votes', players, teller, chosen_cards, guesses);
   }
@@ -170,12 +177,16 @@ function guesser_card_to_play(socket, card){
   console.log(socket.pseudo +" a chosi la carte "+card);
   socket.main.splice(socket.main.indexOf(card), 1);
   a_defausser.push(card);
-  if(Object.keys(chosen_cards).length==players.length){
+  if(Object.keys(chosen_cards).length==players.length){  // if everybody chose a card
+    stopCountdown();
     socket.emit('change_view', "D");
     socket.broadcast.emit('change_view', "D");
     a_defausser = shuffle(a_defausser); // On mélange les cartes pour brouiller les pistes
     socket.emit('start_guessing', players.length, a_defausser);
     socket.broadcast.emit('start_guessing', players.length, a_defausser);
+    
+    // Start timer
+    countdown(socket, timer_seconds_vote);
   } else {
     socket.emit('card_received');
   }
@@ -188,6 +199,9 @@ function teller_choice(socket, card, key_phrase){
   socket.main.splice(socket.main.indexOf(card), 1);
   socket.emit('reveal_teller_choice', card, key_phrase);
   socket.broadcast.emit('reveal_teller_choice', card, key_phrase);
+
+  // Restart timer
+  countdown(socket, timer_seconds);
 }
 
 function total_round_number(socket, number){
@@ -203,6 +217,27 @@ function tirage(socket){
 	}
 	socket.main = socket.main.concat(gestionCartes.tirerCartes(6 - socket.main.length));
 	socket.emit('tirage', socket.main);
+}
+
+let timer;
+let seconds_remaining;
+function countdown(socket, start){
+  stopCountdown();
+  seconds_remaining = start;
+  timer = setInterval(() => {
+    socket.emit('timer', seconds_remaining);
+    socket.broadcast.emit('timer', seconds_remaining);
+    seconds_remaining--;
+    if(seconds_remaining == -1){
+      socket.emit('timeout');
+      socket.broadcast.emit('timeout');
+      stopCountdown();
+    }
+  }, 1000);
+}
+
+function stopCountdown(){
+  clearInterval(timer);
 }
 
 function pseudo(socket, pseudo){
@@ -257,6 +292,8 @@ function start_game(socket){
   teller = chef;
   socket.emit('new_teller', teller);
   socket.broadcast.emit('new_teller', teller);	
+  // Start timer
+  countdown(socket, timer_seconds_teller);
 }
 
 /* Functions exports */
@@ -270,6 +307,7 @@ exports.computeScores = computeScores;
 exports.computeScoresOneGame = computeScoresOneGame;
 exports.reset = reset;
 exports.defausser_cartes = defausser_cartes;
+exports.stopCountdown = stopCountdown;
 
 /* Functions using socket */
 exports.next_turn = next_turn;
@@ -283,6 +321,7 @@ exports.tirage = tirage;
 exports.pseudo = pseudo;
 exports.disconnect = disconnect;
 exports.start_game = start_game;
+exports.countdown = countdown;
 
 /* Variables  exports*/
 exports.players = players;
