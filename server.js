@@ -75,8 +75,8 @@ io.sockets.on('connection', function (socket, pseudo) {
     	gestionServeur.defausser_cartes();
     });
 
-    socket.on('counter_choice', function(card, key_phrase) {
-    	gestionServeur.counter_choice(socket, card, key_phrase);
+    socket.on('teller_choice', function(card, key_phrase) {
+    	gestionServeur.teller_choice(socket, card, key_phrase);
     });
 
     socket.on('guesser_card_to_play', function(card) {
