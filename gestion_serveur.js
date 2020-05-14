@@ -88,14 +88,14 @@ function computeScoresOneGame(){
 }
 
 function reset(){	
-	gestionCartes.defausserCartes(a_defausser);
+	gestionCartes.chargerCartes();
 	a_defausser = [];
 	scores = null;
 	players = [];
 	leader = ""; 
   teller = "";
   index_teller = 0;
-  chosen_cards={};
+  chosen_cards = {};
   guesses={};
   total_rounds = 3;
 	done_rounds = 0;
@@ -158,11 +158,12 @@ function reveal_total_scores(socket){
   }	
 }
 
-function guesser_choice(socket, pseudo, card){
+function guesser_choice(socket, card){
+  if(!socket.pseudo){ return; }
 	card = cleanCardName(card);
-  guesses[pseudo]=card;
+  guesses[socket.pseudo]=card;
 
-  console.log(pseudo +" a choisi la carte  " + card);
+  console.log(socket.pseudo +" a choisi la carte  " + card);
   
   if(Object.keys(guesses).length == players.length-1){  // if everybody voted
     stopCountdown();
@@ -172,6 +173,7 @@ function guesser_choice(socket, pseudo, card){
 }
 
 function guesser_card_to_play(socket, card){
+  if(!socket.pseudo || !socket.main){ return; }
 	card = cleanCardName(card);
   chosen_cards[socket.pseudo]=card;
   console.log(socket.pseudo +" a chosi la carte "+card);
@@ -193,6 +195,7 @@ function guesser_card_to_play(socket, card){
 }
 
 function teller_choice(socket, card, key_phrase){
+  if(!socket.pseudo){ return; }
 	card = cleanCardName(card);
   chosen_cards[teller] = card;
   a_defausser.push(card);
@@ -212,6 +215,7 @@ function total_round_number(socket, number){
 }
 
 function tirage(socket){
+  if(!socket.pseudo){ return; }
 	if(!socket.main){
 		socket.main = [];
 	}

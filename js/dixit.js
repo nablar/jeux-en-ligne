@@ -199,7 +199,7 @@ function sendVote() {
             if (chosen_card_to_play == src){
                 display_message_snackbar("Tu ne peux pas voter pour ta propre carte, petit tricheur !");
             } else {
-                socket.emit('guesser_choice', pseudo, src);
+                socket.emit('guesser_choice', src);
 
                 //Change title
                 change_style_of_class("hide-after-vote", "display:none");

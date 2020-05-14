@@ -83,8 +83,8 @@ io.sockets.on('connection', function (socket, pseudo) {
     	gestionServeur.guesser_card_to_play(socket, card);
     });
 
-    socket.on('guesser_choice', function(pseudo, card) {
-    	gestionServeur.guesser_choice(socket, pseudo, card);
+    socket.on('guesser_choice', function(card) {
+    	gestionServeur.guesser_choice(socket, card);
     });
 
     socket.on('reveal_total_scores', function() {
