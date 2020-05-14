@@ -277,7 +277,11 @@ function disconnect(socket){
     players.splice(index,1);
     socket.broadcast.emit('players_list', players);
 
-    if(socket.pseudo==chef) {
+    if(players.length == 0) {
+      console.log("Tous les joueurs sont partis. Re-initialisation.")
+      next_game(socket);
+    } 
+    if(socket.pseudo == chef && players.length != 0) {
       chef = players[0];
       socket.broadcast.emit('new_leader', chef);
       console.log("le nouveau chef est " + chef);
@@ -285,7 +289,7 @@ function disconnect(socket){
   }
 }
 
-function start_game(socket){
+function start_game(socket) {
   socket.emit('change_view', "C");
   socket.broadcast.emit('change_view', "C");
   index_teller = 0;
@@ -294,6 +298,11 @@ function start_game(socket){
   socket.broadcast.emit('new_teller', teller);	
   // Start timer
   countdown(socket, timer_seconds_teller);
+}
+
+function next_game(socket) {
+  socket.emit('redirect', "/reset");
+  socket.broadcast.emit('redirect', "/reset");
 }
 
 /* Functions exports */
@@ -322,6 +331,7 @@ exports.pseudo = pseudo;
 exports.disconnect = disconnect;
 exports.start_game = start_game;
 exports.countdown = countdown;
+exports.next_game = next_game;
 
 /* Variables  exports*/
 exports.players = players;
