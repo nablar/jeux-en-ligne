@@ -133,6 +133,10 @@
 
             <ul id="players-scores-list" style="list-style:none;"></ul>
 
+            <p class="hide-if-not-leader">
+                <input id="start-new-game" type="submit" value="Recommencer une partie" onclick="socket.emit('next_game');"/>
+            </p>
+
         </div>
         
 

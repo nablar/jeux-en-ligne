@@ -432,7 +432,7 @@ function populatePlateau(nbJoueurs, cartes){
     }
 }
 
-socket.on('scores', function(scores){
+socket.on('scores', function(scores) {
     //scores = scores.sort(function(first, second) { return second[1] - first[1]; });
     let table = document.getElementById("scores-table");
     let players_row = document.createElement("tr");
@@ -450,6 +450,9 @@ socket.on('scores', function(scores){
 });
 
 
+socket.on('redirect', function(destination) {
+    window.location.href = destination;
+})
 
 function change_style_of_class(class_name, new_style) {
     for(let i=0; i<document.getElementsByClassName(class_name).length; i++){

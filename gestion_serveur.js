@@ -285,7 +285,7 @@ function disconnect(socket){
   }
 }
 
-function start_game(socket){
+function start_game(socket) {
   socket.emit('change_view', "C");
   socket.broadcast.emit('change_view', "C");
   index_teller = 0;
@@ -294,6 +294,11 @@ function start_game(socket){
   socket.broadcast.emit('new_teller', teller);	
   // Start timer
   countdown(socket, timer_seconds_teller);
+}
+
+function next_game(socket) {
+  socket.emit('redirect', "/reset");
+  socket.broadcast.emit('redirect', "/reset");
 }
 
 /* Functions exports */
@@ -322,6 +327,7 @@ exports.pseudo = pseudo;
 exports.disconnect = disconnect;
 exports.start_game = start_game;
 exports.countdown = countdown;
+exports.next_game = next_game;
 
 /* Variables  exports*/
 exports.players = players;
