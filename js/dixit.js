@@ -451,6 +451,7 @@ socket.on('scores', function(scores) {
 
 
 socket.on('redirect', function(destination) {
+	window.onbeforeunload = undefined;
     window.location.href = destination;
 })
 
