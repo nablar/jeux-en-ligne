@@ -277,7 +277,11 @@ function disconnect(socket){
     players.splice(index,1);
     socket.broadcast.emit('players_list', players);
 
-    if(socket.pseudo==chef) {
+    if(players.length == 0) {
+      console.log("Tous les joueurs sont partis. Re-initialisation.")
+      next_game(socket);
+    } 
+    if(socket.pseudo == chef && players.length != 0) {
       chef = players[0];
       socket.broadcast.emit('new_leader', chef);
       console.log("le nouveau chef est " + chef);
