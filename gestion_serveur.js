@@ -2,7 +2,7 @@ const gestionCartes = require('./gestion_cartes');
 const gestionScores = require('./gestion_scores');
 
 let players = [];
-let chef; 
+let leader; 
 let teller;
 let index_teller = 0;
 let chosen_cards={};
@@ -92,7 +92,7 @@ function reset(){
 	a_defausser = [];
 	scores = null;
 	players = [];
-	chef = ""; 
+	leader = ""; 
   teller = "";
   index_teller = 0;
   chosen_cards={};
@@ -247,9 +247,9 @@ function pseudo(socket, pseudo){
     console.log(pseudo + " vient de se connecter.");
     
     if(players.length == 0){
-      chef = pseudo;
+      leader = pseudo;
     }
-    socket.emit('new_leader', chef);
+    socket.emit('new_leader', leader);
     players.push(pseudo);
 
     socket.emit('change_view', "B");
@@ -281,10 +281,10 @@ function disconnect(socket){
       console.log("Tous les joueurs sont partis. Re-initialisation.")
       next_game(socket);
     } 
-    if(socket.pseudo == chef && players.length != 0) {
-      chef = players[0];
-      socket.broadcast.emit('new_leader', chef);
-      console.log("le nouveau chef est " + chef);
+    if(socket.pseudo == leader && players.length != 0) {
+      leader = players[0];
+      socket.broadcast.emit('new_leader', leader);
+      console.log("le nouveau leader est " + leader);
     }
   }
 }
@@ -293,7 +293,7 @@ function start_game(socket) {
   socket.emit('change_view', "C");
   socket.broadcast.emit('change_view', "C");
   index_teller = 0;
-  teller = chef;
+  teller = leader;
   socket.emit('new_teller', teller);
   socket.broadcast.emit('new_teller', teller);	
   // Start timer
@@ -335,7 +335,7 @@ exports.next_game = next_game;
 
 /* Variables  exports*/
 exports.players = players;
-exports.chef = chef; 
+exports.leader = leader; 
 exports.teller = teller;
 exports.index_teller = index_teller;
 exports.chosen_cards = chosen_cards;
