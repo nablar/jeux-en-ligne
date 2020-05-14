@@ -12,7 +12,6 @@ let chosen_card_to_play;  // contains the card chosen to display on the board ga
 let total_round_number = 3;  // contains the number of rounds chosen by the leader on view B
 let current_round_number = 0;  // contains the number of the current round
 let cards_can_be_selected = true;  // according to the moment in the game, cards can or cannot be selected
-let players_list = [];  // TODO : remove because it can change over time, instead send it with socket (or just its size)
 let current_view;  // contains the letter corresponding to the current view
 let teller_chose = false;  // true if the teller already sent its card and phrase
 
@@ -35,7 +34,6 @@ function sendPseudo() {
 /***************************** VUE B *****************************/
 // Receive list of players' pseudo
 socket.on('players_list', function(list) {
-    players_list = list;
     let ul = document.getElementById("online-players");
     
     while (ul.hasChildNodes()) {  
@@ -402,7 +400,7 @@ socket.on('redirect', function(destination) {
 
 /***************************** OTHER FUNCTIONS *****************************/
 
-socket.on('change_view', function(view) {
+socket.on('change_view', function(view, players_list) {
     current_view = view;
     document.getElementsByClassName("current-view")[0].classList.remove("current-view");
     document.getElementById("vue-"+view).classList.add("current-view");
@@ -410,7 +408,7 @@ socket.on('change_view', function(view) {
     if(view === 'C'){
         // change round number on top left
         current_round_number += 1;
-        phrase_next_turn();
+        phrase_next_turn(players_list);
         document.getElementById("current-round-number").innerHTML = Math.ceil(current_round_number/(players_list.length));
         document.getElementById("total-round-number").innerHTML = total_round_number;
         change_style_of_class("reveal-after-start", "");
@@ -436,7 +434,7 @@ socket.on('change_view', function(view) {
 });
 
 
-function phrase_next_turn(){    
+function phrase_next_turn(players_list){    
     document.getElementById("next-turn-button").value = "Conteur suivant !";
     if(current_round_number/players_list.length == Math.ceil(current_round_number/players_list.length)){
         // Nouveau tour

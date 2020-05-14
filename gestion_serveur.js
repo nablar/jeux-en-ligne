@@ -121,8 +121,8 @@ function next_turn(socket){
   socket.broadcast.emit('new_teller', teller);
 
   // Change view
-  socket.emit('change_view', "C");
-  socket.broadcast.emit('change_view', "C");
+  socket.emit('change_view', "C", players);
+  socket.broadcast.emit('change_view', "C", players);
 
   // Start timer
   countdown(socket, timer_seconds_teller);
@@ -140,8 +140,8 @@ function reveal_total_scores(socket){
   done_rounds+=1;
   if(done_rounds == total_rounds * players.length) {
     // Change view
-    socket.emit('change_view', "F");
-    socket.broadcast.emit('change_view', "F");
+    socket.emit('change_view', "F", players);
+    socket.broadcast.emit('change_view', "F", players);
 
     // Emit the final scores
     let ordered_scores = get_ordered_scores();
@@ -150,8 +150,8 @@ function reveal_total_scores(socket){
     socket.broadcast.emit('final_scores', winners, ordered_scores);
 
   } else {
-    socket.emit('change_view', "E");
-    socket.broadcast.emit('change_view', "E");
+    socket.emit('change_view', "E", players);
+    socket.broadcast.emit('change_view', "E", players);
     // Emit the scores
     socket.emit('scores', scores);
     socket.broadcast.emit('scores', scores);
@@ -179,8 +179,8 @@ function guesser_card_to_play(socket, card){
   a_defausser.push(card);
   if(Object.keys(chosen_cards).length==players.length){  // if everybody chose a card
     stopCountdown();
-    socket.emit('change_view', "D");
-    socket.broadcast.emit('change_view', "D");
+    socket.emit('change_view', "D", players);
+    socket.broadcast.emit('change_view', "D", players);
     a_defausser = shuffle(a_defausser); // On mélange les cartes pour brouiller les pistes
     socket.emit('start_guessing', players.length, a_defausser);
     socket.broadcast.emit('start_guessing', players.length, a_defausser);
@@ -252,7 +252,7 @@ function pseudo(socket, pseudo){
     socket.emit('new_leader', leader);
     players.push(pseudo);
 
-    socket.emit('change_view', "B");
+    socket.emit('change_view', "B", players);
     socket.emit('players_list', players);
     // Send new player name to other players
     socket.broadcast.emit('players_list', players);
@@ -290,8 +290,8 @@ function disconnect(socket){
 }
 
 function start_game(socket) {
-  socket.emit('change_view', "C");
-  socket.broadcast.emit('change_view', "C");
+  socket.emit('change_view', "C", players);
+  socket.broadcast.emit('change_view', "C", players);
   index_teller = 0;
   teller = leader;
   socket.emit('new_teller', teller);
