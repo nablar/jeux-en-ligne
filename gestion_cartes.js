@@ -83,3 +83,4 @@ exports.defausserCartes = defausserCartes;
 exports.getDefausse = getDefausse;
 exports.tirerCarte = tirerCarte;
 exports.dossierCartes = cartesDossierNoRel;
+exports.chargerCartes = chargerCartes;
