@@ -4,7 +4,7 @@ body{
     color:white;
     text-align: center;
 }
-#round-number, .phrase-clef, #teller-pseudo{
+#round-number, .phrase-clef, .teller-pseudo{
     color:#1983e6;
 }
 .phrase-clef{

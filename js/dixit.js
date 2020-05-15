@@ -105,7 +105,7 @@ socket.on('new_teller', function(pseudo_teller) {
         change_style_of_class("show-after-vote-for-leader", "display:none");
     }
 
-    let c = document.getElementsByClassName("teller")[0];
+    let c = document.getElementById("teller");
     if(pseudo==pseudo_teller) {
         teller=true;
         c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase.";
@@ -117,7 +117,14 @@ socket.on('new_teller', function(pseudo_teller) {
         // hide before the teller chooses its card
         change_style_of_class("hide-before-teller-choice", "display:none");  
         teller=false;
-        c.innerHTML = "Attends que <span id=\"teller-pseudo\">" + pseudo_teller + "</span> ait choisi sa carte."
+        c.innerHTML = "Attends que <span class=\"teller-pseudo\">" + pseudo_teller + "</span> ait choisi sa carte.";
+
+        if (document.getElementsByClassName("teller-pseudo").length > 0) {
+            for (let i=0; i<document.getElementsByClassName("teller-pseudo").length ; i++) {
+                document.getElementsByClassName("teller-pseudo")[i].innerHTML = pseudo_teller;
+            }
+        }
+        
     }
 });
 
@@ -139,10 +146,10 @@ socket.on('reveal_teller_choice', function(card, key_phrase) {
     }
     if(teller) {
         document.getElementById("phrase-clef-input").style = "display:none";
-        document.getElementsByClassName("teller")[0].innerHTML = "Les autres joueurs sont en train de choisir leurs cartes.";
+        document.getElementById("teller").innerHTML = "Les autres joueurs sont en train de choisir leurs cartes.";
     } else {
         change_style_of_class("hide-before-teller-choice", "");
-        document.getElementsByClassName("teller")[0].innerHTML = "";  
+        document.getElementById("teller").innerHTML = "";  
     }  
     teller_chose = true;
 
@@ -572,7 +579,7 @@ function clearScoresTable(){
 }
 
 function resetConfirmationMessage(){
-    document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : <span class=\"phrase-clef\"></span>";
+    document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : <span class=\"phrase-clef\"></span>.";
 }
 
 function resetTellerPhrase(){

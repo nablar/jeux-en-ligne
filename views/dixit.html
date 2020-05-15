@@ -58,7 +58,7 @@
 
         <!-- VUE C : voir ses cartes -->
         <div id="vue-C" class="vue">
-            <h1 class="teller"></h1>
+            <h1 id="teller"></h1>
 
             <div id="phrase-clef-input" class="hide-if-not-teller">
                 <input type="text" id="phrase-clef-input-text" name="phrase-clef" placeholder="Ta phrase">
@@ -93,8 +93,8 @@
         <div id="vue-D" class="vue">
             <div class="hide-if-teller hide-after-vote">
                 <h1>Passons aux votes !</h1>
-                <h1>Selon toi, quelle est la carte du conteur ? </h1> 
-                <h2>Pour rappel, la phrase contée est : <span class="phrase-clef"></span>.</h2>
+                <h1>Selon toi, quelle est la carte de <span class="teller-pseudo"></span> ? </h1> 
+                <h2>Pour rappel, <span class="teller-pseudo"></span> a conté la phrase suivante : <span class="phrase-clef"></span>.</h2>
                 <input type="submit" value="Voter" onclick="sendVote()"/>
             </div>
             <h1><span class="hide-if-not-teller hide-after-vote">Les autres joueurs sont en train de voter !</span></h1>
