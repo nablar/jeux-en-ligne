@@ -17,7 +17,7 @@ let timer_seconds_vote = 180;
 
 function get_winners(ordered_scores) {
   winners=[ordered_scores[0][0]];
-  i=1;
+  let i=1;
   while(i<ordered_scores.length && ordered_scores[i][1] == ordered_scores[0][1]) {
     winners.push(ordered_scores[i][0]);
     i++;
@@ -35,6 +35,25 @@ function get_ordered_scores() {
     return second[1] - first[1];
   });
   return ordered_scores;
+}
+
+function get_ordered_scores_rank(ordered_scores) {
+  ranks=[];
+  let j=0;
+  let rank=1;
+  while(j<ordered_scores.length) {
+    let score = ordered_scores[j][1];
+    ranks.push([rank, ordered_scores[j][0], score]);
+    j++;
+
+    while(j<ordered_scores.length && ordered_scores[j][1] == score) {
+      ranks.push([rank, ordered_scores[j][0], score]);
+      j++;
+    }
+    rank = ranks.length + 1;
+  }
+  
+  return ranks;
 }
 
 function cleanCardName(cardName){ // Garder seulement le chemin relatif vers l'image de la carte
@@ -115,23 +134,50 @@ function next_turn(socket){
   gestionCartes.defausserCartes(a_defausser);
   a_defausser = [];
 
-  // Change teller
-  next_teller();
-  socket.emit('new_teller', teller);
-  socket.broadcast.emit('new_teller', teller);
 
-  // Change view
-  socket.emit('change_view', "C", players);
-  socket.broadcast.emit('change_view', "C", players);
+  // Check if game is finished
+  done_rounds+=1;
+  if(done_rounds == total_rounds * players.length) {
+    // Change view
+    socket.emit('change_view', "E", players);
+    socket.broadcast.emit('change_view', "E", players);
 
-  // Start timer
-  countdown(socket, timer_seconds_teller);
+    // Emit the final scores
+    let ordered_scores = get_ordered_scores();
+    let ordered_scores_rank = get_ordered_scores_rank(ordered_scores);
+    let winners = get_winners(ordered_scores);
+    socket.emit('final_scores', winners, ordered_scores_rank);
+    socket.broadcast.emit('final_scores', winners, ordered_scores_rank);
+
+  } else {
+    // Change teller
+    next_teller();
+    socket.emit('new_teller', teller);
+    socket.broadcast.emit('new_teller', teller);
+
+    // Change view
+    socket.emit('change_view', "C", players);
+    socket.broadcast.emit('change_view', "C", players);
+
+    // Start timer
+    countdown(socket, timer_seconds_teller);
+  } 
 }
+
 
 function get_round_votes(socket){
-  socket.emit('show_round_votes', computeScoresOneGame());
+  // Compute scores of the rounds
+  let round_scores = computeScoresOneGame();
+  // Compute scores
+  scores = computeScores();
+  // Get ordered scores
+  let ordered_scores = get_ordered_scores();
+  // Get ordered scores with ranks
+  let ordered_scores_rank = get_ordered_scores_rank(ordered_scores);
+  socket.emit('show_round_votes', ordered_scores_rank, round_scores);
 }
 
+/*
 function reveal_total_scores(socket){
   // Compute scores
   scores = computeScores();
@@ -145,18 +191,21 @@ function reveal_total_scores(socket){
 
     // Emit the final scores
     let ordered_scores = get_ordered_scores();
+    let ordered_scores_rank = get_ordered_scores_rank(ordered_scores);
     let winners = get_winners(ordered_scores);
-    socket.emit('final_scores', winners, ordered_scores);
-    socket.broadcast.emit('final_scores', winners, ordered_scores);
+    socket.emit('final_scores', winners, ordered_scores_rank);
+    socket.broadcast.emit('final_scores', winners, ordered_scores_rank);
 
   } else {
     socket.emit('change_view', "E", players);
     socket.broadcast.emit('change_view', "E", players);
     // Emit the scores
-    socket.emit('scores', scores);
-    socket.broadcast.emit('scores', scores);
+    let ordered_scores = get_ordered_scores();
+    let ordered_scores_rank = get_ordered_scores_rank(ordered_scores);
+    socket.emit('scores', ordered_scores_rank);
+    socket.broadcast.emit('scores', ordered_scores_rank);
   }	
-}
+}*/
 
 function guesser_choice(socket, card){
   if(!socket.pseudo){ return; }
@@ -321,11 +370,12 @@ exports.computeScoresOneGame = computeScoresOneGame;
 exports.reset = reset;
 exports.defausser_cartes = defausser_cartes;
 exports.stopCountdown = stopCountdown;
+exports.get_ordered_scores_rank = get_ordered_scores_rank;
 
 /* Functions using socket */
 exports.next_turn = next_turn;
 exports.get_round_votes = get_round_votes;
-exports.reveal_total_scores = reveal_total_scores;
+//exports.reveal_total_scores = reveal_total_scores;
 exports.guesser_choice = guesser_choice;
 exports.guesser_card_to_play = guesser_card_to_play;
 exports.teller_choice = teller_choice;

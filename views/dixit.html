@@ -101,7 +101,11 @@
 
             <div><h1 id="title-after-vote"></h1></div>
 
-            <input id="reveal-total-scores-button" class="hide-if-not-leader show-after-vote-for-leader" type="submit" value="Voir les scores" onclick="socket.emit('reveal_total_scores');"/>
+            <p class="hide-if-not-leader show-after-vote-for-leader">
+                <input id="next-turn-button" type="submit" value="Conteur suivant !" onclick="socket.emit('next_turn');"/>
+            </p>
+
+            <!--<input id="reveal-total-scores-button" class="hide-if-not-leader show-after-vote-for-leader" type="submit" value="Voir les scores" onclick="socket.emit('reveal_total_scores');"/> -->
 
             <div class="cards-container">
                 <table>
@@ -109,24 +113,12 @@
                     </tbody>
                 </table>
             </div>
+
         </div>
 
 
-        <!-- VUE E : scores -->
+        <!-- VUE E : fin de partie, scores finaux -->
         <div id="vue-E" class="vue">
-            <h1>Voici les scores</h1>
-            <div class="scores">
-                <table><tbody id="scores-table"></tbody></table>
-            </div>
-
-            <p class="hide-if-not-leader">
-                <input id="next-turn-button" type="submit" value="Conteur suivant !" onclick="socket.emit('next_turn');"/>
-            </p>
-        </div>
-
-
-        <!-- VUE F : fin de partie, scores finaux -->
-        <div id="vue-F" class="vue">
             <h1>La partie est terminée !</h1>
 
             <h2 id="winner-name"></h2>

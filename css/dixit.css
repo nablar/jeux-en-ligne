@@ -89,10 +89,7 @@ div.vue{
 div.current-view{
     display:block;
 }
-td{
-    width:30%;
-    height: 50%;
-}
+
 img.carte, img.carte-d{                        
     width:90%;
     height:auto;
