@@ -117,7 +117,7 @@ socket.on('new_teller', function(pseudo_teller) {
         // hide before the teller chooses its card
         change_style_of_class("hide-before-teller-choice", "display:none");  
         teller=false;
-        c.innerHTML = "Le conteur est : <span id=\"teller-pseudo\">" + pseudo_teller + "</span>. Attends qu'il ait choisi sa carte."
+        c.innerHTML = "Attends que <span id=\"teller-pseudo\">" + pseudo_teller + "</span> ait choisi sa carte."
     }
 });
 
@@ -162,8 +162,17 @@ function cardToPlayChosen() {
     }
 }
 
+let card_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !", "Bien !", "D'accord !", "Drôle de choix !",
+    "Bon choix !", "C'est noté !", "Pas sûr que ça fasse illusion !", "Très bien !", "Faisons comme ça !", "Pourquoi pas !", 
+    "Espérons que ça passe !", "Les autres seront dupés !"];
+let card_received_msg_second_part = ["Attendons les autres joueurs...", "Attendons les retardataires..." ,
+    "Ne soit pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
+    "Dommage que tout le monde ne soit pas aussi rapide que toi...", "Attends que les autres joueurs soient prêts...",
+    "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu..."];
+
 socket.on('card_received', function() {
-    document.getElementById("inst-with-keyphrase").innerHTML="Bien noté ! Attendons les autres joueurs..."
+    let card_received_msg = random_element_in_list(card_received_msg_first_part) + " " + random_element_in_list(card_received_msg_second_part);
+    document.getElementById("inst-with-keyphrase").innerHTML = card_received_msg;
     let to_hide = document.getElementById("choose-card-to-play");
     to_hide.style="display:none";
     cards_can_be_selected = false;
@@ -185,6 +194,14 @@ socket.on('start_guessing', function(nbJoueurs, cartes){
     populatePlateau(nbJoueurs, cartes);
 });
 
+let vote_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !", "Bien !", "D'accord !", "Drôle de choix !",
+    "Bon choix !", "C'est noté !", "Pas sûr que ça soit le bon choix !", "Très bien !", "Tentons le !", "Pourquoi pas !", 
+    "Espérons que ça soit le bon choix !", "Les autres seront ébahis !", "Ton vote est pris en compte !", "Vote enregistré !"];
+let vote_received_msg_second_part = ["Attendons les autres joueurs...", "Attendons les retardataires..." ,
+    "Ne soit pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
+    "Dommage que tout le monde ne soit pas aussi rapide que toi...", "Attends que les autres joueurs soient prêts...",
+    "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu...", "Qu'attendent les autres, le choix est simple, pourtant...",
+    "Patiente jusqu'à ce que tout le monde ait voté..."];
 
 
 function sendVote() {
@@ -204,7 +221,8 @@ function sendVote() {
 
                 //Change title
                 change_style_of_class("hide-after-vote", "display:none");
-                document.getElementById("title-after-vote").innerHTML = "Vote enregistré ! Attendons les autres joueurs...";
+                let vote_received_msg = random_element_in_list(vote_received_msg_first_part) + " " + random_element_in_list(vote_received_msg_second_part);
+                document.getElementById("title-after-vote").innerHTML = vote_received_msg;
                 cards_can_be_selected = false; // Block card selection
             }                        
         }
@@ -495,7 +513,13 @@ function change_style_of_class(class_name, new_style) {
     }
 }
 
+function random_number_in_range(max) {
+    return Math.floor(Math.random() * max);
+}
 
+function random_element_in_list(list) {
+    return list[random_number_in_range(list.length)];
+}
 
 
 /***************************** SHOW MESSAGES *****************************/
@@ -554,3 +578,4 @@ function resetConfirmationMessage(){
 function resetTellerPhrase(){
     document.getElementById("phrase-clef-input-text").value = "";
 }
+
