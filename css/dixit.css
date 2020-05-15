@@ -93,7 +93,7 @@ div.current-view{
 img.carte, img.carte-d{                        
     width:90%;
     height:auto;
-    border: 5px hidden #ccddff;
+    border: 5px solid rgba(0,0,0,0);
     border-radius: 30px;
 }
 img.carte-choisie, img.carte-choisie-d{

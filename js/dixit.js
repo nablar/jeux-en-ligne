@@ -161,7 +161,7 @@ function cardToPlayChosen() {
     if(teller) {
         display_message_snackbar("Tu ne vas pas donner 2 cartes !");
     } else {
-        if(document.getElementsByClassName("carte-choisie").length==0){
+        if(document.getElementsByClassName("carte-choisie").length == 0){
             display_message_snackbar("N'oublie pas de sélectionner une carte d'abord !");
         } else {
             let carte = document.getElementsByClassName("carte-choisie")[0];
@@ -173,11 +173,12 @@ function cardToPlayChosen() {
 
 let card_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !", "Bien !", "D'accord !", "Drôle de choix !",
     "Bon choix !", "C'est noté !", "Pas sûr que ça fasse illusion !", "Très bien !", "Faisons comme ça !", "Pourquoi pas !", 
-    "Espérons que ça passe !", "Les autres seront dupés !"];
+    "Espérons que ça passe !", "Les autres seront dupés !", "Ça passe ou ça casse !", "Bonne idée de se débarasser des cartes nulles !",
+    "Même la carte du conteur est moins bien !", "Tout le monde va voter pour toi !"];
 let card_received_msg_second_part = ["Attendons les autres joueurs...", "Attendons les retardataires..." ,
     "Ne soit pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
     "Dommage que tout le monde ne soit pas aussi rapide que toi...", "Attends que les autres joueurs soient prêts...",
-    "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu..."];
+    "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu...", "Plus qu'à attendre les autres..."];
 
 socket.on('card_received', function() {
     let card_received_msg = random_element_in_list(card_received_msg_first_part) + " " + random_element_in_list(card_received_msg_second_part);
@@ -204,13 +205,14 @@ socket.on('start_guessing', function(nbJoueurs, cartes){
 });
 
 let vote_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !", "Bien !", "D'accord !", "Drôle de choix !",
-    "Bon choix !", "C'est noté !", "Pas sûr que ça soit le bon choix !", "Très bien !", "Tentons le !", "Pourquoi pas !", 
-    "Espérons que ça soit le bon choix !", "Les autres seront ébahis !", "Ton vote est pris en compte !", "Vote enregistré !"];
+    "Bon choix !", "C'est noté !", "Pas sûr que ça soit le bon choix !", "Très bien !", "Tentons-le !", "Pourquoi pas !", 
+    "Espérons que ça soit le bon choix !", "Les autres seront ébahis !", "Ton vote est pris en compte !", "Vote enregistré !", 
+    "Bien vu !", "Croisons les doigts !", "Ça passe ou ça casse !"];
 let vote_received_msg_second_part = ["Attendons les autres joueurs...", "Attendons les retardataires..." ,
-    "Ne soit pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
+    "Ne sois pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
     "Dommage que tout le monde ne soit pas aussi rapide que toi...", "Attends que les autres joueurs soient prêts...",
-    "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu...", "Qu'attendent les autres, le choix est simple, pourtant...",
-    "Patiente jusqu'à ce que tout le monde ait voté..."];
+    "Les autres ne sont pas aussi rapides...", "Les autres traînent un peu...", "Qu'attendent les autres, le choix est simple, pourtant...",
+    "Patiente jusqu'à ce que tout le monde ait voté...", "Plus qu'à attendre les autres..."];
 
 
 function sendVote() {
