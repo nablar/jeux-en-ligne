@@ -2,6 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const express = require('express');
 const gestionServeur = require('./gestion_serveur');
+const path = require('path');
+const favicon = require('express-favicon');
 
 const app = require('express')();
 const server = require('http').Server(app);
@@ -9,6 +11,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 app.use(express.static('cartes'));
+app.use(favicon(path.join(__dirname, 'favicon.png'))); 
 // Chargement du fichier pseudo.html affiché au client
 app.get('/', function(req, res) {
     fs.readFile('views/dixit.html', function(error, content) {
