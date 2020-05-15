@@ -181,6 +181,7 @@ function cardSelected(id){
 
 /***************************** VUE D - 1st part : send votes *****************************/
 socket.on('start_guessing', function(nbJoueurs, cartes){
+    clearPlateau(); // supprimer les cartes du tour précédent
     populatePlateau(nbJoueurs, cartes);
 });
 
