@@ -4,7 +4,7 @@ body{
     color:white;
     text-align: center;
 }
-#round-number, .phrase-clef, #teller-pseudo{
+#round-number, .phrase-clef, .teller-pseudo{
     color:#1983e6;
 }
 .phrase-clef{
@@ -15,7 +15,7 @@ body{
     top:0;
     left:0;
 }
-#top-right-pseudo {
+#top-right-teller {
     position:absolute;
     top:0;
     right:0;
@@ -89,10 +89,7 @@ div.vue{
 div.current-view{
     display:block;
 }
-td{
-    width:30%;
-    height: 50%;
-}
+
 img.carte, img.carte-d{                        
     width:90%;
     height:auto;
@@ -116,16 +113,11 @@ div.cards-container tr{
 table{
     margin: 0 auto;
 }
-div.scores table, table.round-scores-table{
-    border-collapse: collapse;
-    margin-bottom:50px;
-}
-#scores-table td, #scores-table th, #round-scores td, #round-scores th{
-    padding:20px;
-    border: 1px solid white;
-}
-#scores-table td, #round-scores td{
-    font-weight: normal;
+
+.scores-table {
+    border-spacing: 15px 0;
+    border: 1px solid #1469b8;
+    padding: 10px 3px 10px 3px;
 }
 
 #round-number-input {

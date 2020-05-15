@@ -25,7 +25,6 @@ function sendPseudo() {
     pseudo = document.getElementById("pseudo-input").value;
     socket.emit('pseudo', pseudo);
     document.getElementById("pseudo").innerHTML = "Bienvenue " + pseudo + " !";
-    document.getElementById("top-right-pseudo").innerHTML = "Pseudo : " + pseudo;
 }
 
 
@@ -98,6 +97,7 @@ socket.on('tirage', function(cartes){
 });
 
 socket.on('new_teller', function(pseudo_teller) {
+    document.getElementById("top-right-teller").innerHTML = "Conteur : " + pseudo_teller;
     teller_chose = false;
     // Re initialize
     document.getElementById("title-after-vote").innerHTML ="";
@@ -105,7 +105,7 @@ socket.on('new_teller', function(pseudo_teller) {
         change_style_of_class("show-after-vote-for-leader", "display:none");
     }
 
-    let c = document.getElementsByClassName("teller")[0];
+    let c = document.getElementById("teller");
     if(pseudo==pseudo_teller) {
         teller=true;
         c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase.";
@@ -118,7 +118,14 @@ socket.on('new_teller', function(pseudo_teller) {
         // hide before the teller chooses its card
         change_style_of_class("hide-before-teller-choice", "display:none");  
         teller=false;
-        c.innerHTML = "Le conteur est : <span id=\"teller-pseudo\">" + pseudo_teller + "</span>. Attends qu'il ait choisi sa carte."
+        c.innerHTML = "Attends que <span class=\"teller-pseudo\">" + pseudo_teller + "</span> ait choisi sa carte.";
+
+        if (document.getElementsByClassName("teller-pseudo").length > 0) {
+            for (let i=0; i<document.getElementsByClassName("teller-pseudo").length ; i++) {
+                document.getElementsByClassName("teller-pseudo")[i].innerHTML = pseudo_teller;
+            }
+        }
+        
     }
 });
 
@@ -140,10 +147,10 @@ socket.on('reveal_teller_choice', function(card, key_phrase) {
     }
     if(teller) {
         document.getElementById("phrase-clef-input").style = "display:none";
-        document.getElementsByClassName("teller")[0].innerHTML = "Les autres joueurs sont en train de choisir leurs cartes.";
+        document.getElementById("teller").innerHTML = "Les autres joueurs sont en train de choisir leurs cartes.";
     } else {
         change_style_of_class("hide-before-teller-choice", "");
-        document.getElementsByClassName("teller")[0].innerHTML = "";  
+        document.getElementById("teller").innerHTML = "";  
         notification_soud.play();
         window.scrollTo(0,0);
     }  
@@ -164,8 +171,17 @@ function cardToPlayChosen() {
     }
 }
 
+let card_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !", "Bien !", "D'accord !", "Drôle de choix !",
+    "Bon choix !", "C'est noté !", "Pas sûr que ça fasse illusion !", "Très bien !", "Faisons comme ça !", "Pourquoi pas !", 
+    "Espérons que ça passe !", "Les autres seront dupés !"];
+let card_received_msg_second_part = ["Attendons les autres joueurs...", "Attendons les retardataires..." ,
+    "Ne soit pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
+    "Dommage que tout le monde ne soit pas aussi rapide que toi...", "Attends que les autres joueurs soient prêts...",
+    "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu..."];
+
 socket.on('card_received', function() {
-    document.getElementById("inst-with-keyphrase").innerHTML="Bien noté ! Attendons les autres joueurs..."
+    let card_received_msg = random_element_in_list(card_received_msg_first_part) + " " + random_element_in_list(card_received_msg_second_part);
+    document.getElementById("inst-with-keyphrase").innerHTML = card_received_msg;
     let to_hide = document.getElementById("choose-card-to-play");
     to_hide.style="display:none";
     cards_can_be_selected = false;
@@ -187,6 +203,14 @@ socket.on('start_guessing', function(nbJoueurs, cartes){
     populatePlateau(nbJoueurs, cartes);
 });
 
+let vote_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !", "Bien !", "D'accord !", "Drôle de choix !",
+    "Bon choix !", "C'est noté !", "Pas sûr que ça soit le bon choix !", "Très bien !", "Tentons le !", "Pourquoi pas !", 
+    "Espérons que ça soit le bon choix !", "Les autres seront ébahis !", "Ton vote est pris en compte !", "Vote enregistré !"];
+let vote_received_msg_second_part = ["Attendons les autres joueurs...", "Attendons les retardataires..." ,
+    "Ne soit pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
+    "Dommage que tout le monde ne soit pas aussi rapide que toi...", "Attends que les autres joueurs soient prêts...",
+    "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu...", "Qu'attendent les autres, le choix est simple, pourtant...",
+    "Patiente jusqu'à ce que tout le monde ait voté..."];
 
 
 function sendVote() {
@@ -206,7 +230,8 @@ function sendVote() {
 
                 //Change title
                 change_style_of_class("hide-after-vote", "display:none");
-                document.getElementById("title-after-vote").innerHTML = "Vote enregistré ! Attendons les autres joueurs...";
+                let vote_received_msg = random_element_in_list(vote_received_msg_first_part) + " " + random_element_in_list(vote_received_msg_second_part);
+                document.getElementById("title-after-vote").innerHTML = vote_received_msg;
                 cards_can_be_selected = false; // Block card selection
             }                        
         }
@@ -257,11 +282,6 @@ socket.on('show_votes', function(players_list, teller_pseudo, chosen_cards, gues
     document.getElementById("title-after-vote").innerHTML = "Voici les résultats des votes";
 
     socket.emit('get_round_votes');
-    
-    // Show button to reveal scores for the leader
-    if(leader) {
-        document.getElementById("reveal-total-scores-button").style="";
-    }
     
     let card_list = document.getElementsByClassName("carte-d");
     // Show results of votes 
@@ -316,29 +336,53 @@ function showCardsOwners(card_list, players_list, chosen_cards, teller_pseudo) {
     }
 }
 
-socket.on('show_round_votes', function(round_scores) {
-    showRoundVotes(round_scores);
+socket.on('show_round_votes', function(ordered_scores_rank, round_scores) {
+    showRoundVotes(ordered_scores_rank, round_scores);
 });
 
-function showRoundVotes(round_scores) {    
+function showRoundVotes(ordered_scores_rank, round_scores) {    
     cards_can_be_selected = false; // Block card selection
     let title = document.getElementById("title-after-vote");
     let table = document.createElement("table");
-    table.id = "round-scores";
-    table.classList.add("round-scores-table");
+    table.id = "scores";
+    table.classList.add("scores-table");
+
+    // header of table
+    let thead = document.createElement("thead");
+    let title_row = document.createElement("tr");
+
+    let title_rank = document.createElement("th");
+    title_rank.innerHTML = "Rang";
+    title_row.appendChild(title_rank);
+    let title_pseudo = document.createElement("th");
+    title_pseudo.innerHTML = "Pseudo";
+    title_row.appendChild(title_pseudo);
+    let title_score = document.createElement("th");
+    title_score.innerHTML = "Points";
+    title_row.appendChild(title_score);
+
+    thead.appendChild(title_row);
+    table.appendChild(thead);
+
+
+    // body of table
     let tbody = document.createElement("tbody");
-    let players_row = document.createElement("tr");
-    let scores_row = document.createElement("tr");
-    for(let player in round_scores){
-        let th = document.createElement("th");
-        let td = document.createElement("td");
-        th.innerHTML = player;
-        td.innerHTML = "+ "+round_scores[player];
-        players_row.appendChild(th);
-        scores_row.appendChild(td);
+
+    for(let i=0; i<ordered_scores_rank.length; i++){
+        let player_row = document.createElement("tr");
+        let rank = document.createElement("td");
+        rank.innerHTML = ordered_scores_rank[i][0];
+        let pseudo = document.createElement("td");
+        pseudo.innerHTML = ordered_scores_rank[i][1];
+        let score = document.createElement("td");
+        score.innerHTML = ordered_scores_rank[i][2] + " (+" + round_scores[ordered_scores_rank[i][1]] + ")" ;
+
+        player_row.appendChild(rank);
+        player_row.appendChild(pseudo);
+        player_row.appendChild(score);
+
+        tbody.appendChild(player_row);
     }
-    tbody.appendChild(players_row);
-    tbody.appendChild(scores_row);
     table.appendChild(tbody);
     title.parentNode.appendChild(table);
 }
@@ -348,26 +392,6 @@ function showRoundVotes(round_scores) {
 
 
 /***************************** VUE E *****************************/
-socket.on('scores', function(scores) {
-    let table = document.getElementById("scores-table");
-    let players_row = document.createElement("tr");
-    let scores_row = document.createElement("tr");
-    for(let player in scores){
-        let th = document.createElement("th");
-        let td = document.createElement("td");
-        th.innerHTML = player;
-        td.innerHTML = scores[player];
-        players_row.appendChild(th);
-        scores_row.appendChild(td);
-    }
-    table.appendChild(players_row);
-    table.appendChild(scores_row);
-});
-
-
-
-
-/***************************** VUE F *****************************/
 socket.on('final_scores', function(winner, scores) {
     if(winner.length == 1) {
         document.getElementById("winner-name").innerHTML="Le gagnant est " + winner[0] + " !";
@@ -380,16 +404,22 @@ socket.on('final_scores', function(winner, scores) {
         document.getElementById("winner-name").innerHTML="Les gagnants sont : " + winners_name;
     }
     
-    let ul = document.getElementById("players-scores-list");
+    let tbody = document.getElementById("final-scores-table-body");
     
-    while (ul.hasChildNodes()) {  
-        ul.removeChild(ul.firstChild);
-    }
+    for(let i=0; i<scores.length; i++){
+        let player_row = document.createElement("tr");
+        let rank = document.createElement("td");
+        rank.innerHTML = scores[i][0];
+        let pseudo = document.createElement("td");
+        pseudo.innerHTML = scores[i][1];
+        let score = document.createElement("td");
+        score.innerHTML = scores[i][2];
 
-    for (let i=0; i<scores.length ; i++) {
-        let li = document.createElement("li");
-        li.appendChild(document.createTextNode(scores[i][0] + " : " + scores[i][1] + " points"));
-        ul.appendChild(li);
+        player_row.appendChild(rank);
+        player_row.appendChild(pseudo);
+        player_row.appendChild(score);
+
+        tbody.appendChild(player_row);
     }
 });
 
@@ -451,6 +481,9 @@ function phrase_next_turn(players_list){
             document.getElementById("next-turn-button").value = "Dernier tour !";
         }            
     }
+    if(current_round_number == total_round_number * players_list.length) {
+        document.getElementById("next-turn-button").value = "Voir les gagnants !";
+    }
 }
 
 socket.on('timer', function(time) {
@@ -502,7 +535,13 @@ function change_style_of_class(class_name, new_style) {
     }
 }
 
+function random_number_in_range(max) {
+    return Math.floor(Math.random() * max);
+}
 
+function random_element_in_list(list) {
+    return list[random_number_in_range(list.length)];
+}
 
 
 /***************************** SHOW MESSAGES *****************************/
@@ -541,23 +580,17 @@ function clearPlateau(){
 }
 
 function clearScoresTable(){
-    /* Tableau des scores de la partie */
-    let scores_table = document.getElementById("scores-table");
-    while(scores_table.hasChildNodes()){
-        scores_table.removeChild(scores_table.childNodes[0]);
-    }
-
-    /* Tableau des scores généraux */
-    let table = document.getElementById("round-scores");
+    let table = document.getElementById("scores");
     if(table){
         table.parentNode.removeChild(table);
     }
 }
 
 function resetConfirmationMessage(){
-    document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : <span class=\"phrase-clef\"></span>";
+    document.getElementById("inst-with-keyphrase").innerHTML = "Choisis ta carte qui se rapporte le mieux à : <span class=\"phrase-clef\"></span>.";
 }
 
 function resetTellerPhrase(){
     document.getElementById("phrase-clef-input-text").value = "";
 }
+
