@@ -25,7 +25,6 @@ function sendPseudo() {
     pseudo = document.getElementById("pseudo-input").value;
     socket.emit('pseudo', pseudo);
     document.getElementById("pseudo").innerHTML = "Bienvenue " + pseudo + " !";
-    document.getElementById("top-right-pseudo").innerHTML = "Pseudo : " + pseudo;
 }
 
 
@@ -98,6 +97,7 @@ socket.on('tirage', function(cartes){
 });
 
 socket.on('new_teller', function(pseudo_teller) {
+    document.getElementById("top-right-teller").innerHTML = "Conteur : " + pseudo_teller;
     teller_chose = false;
     // Re initialize
     document.getElementById("title-after-vote").innerHTML ="";
