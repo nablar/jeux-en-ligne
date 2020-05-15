@@ -138,7 +138,7 @@ function reveal_total_scores(socket){
 
   // Check if game is finished
   done_rounds+=1;
-  if(done_rounds == total_rounds * players.length + 1) {
+  if(done_rounds == total_rounds * players.length) {
     // Change view
     socket.emit('change_view', "F", players);
     socket.broadcast.emit('change_view', "F", players);
