@@ -175,6 +175,7 @@ function get_round_votes(socket){
   // Get ordered scores with ranks
   let ordered_scores_rank = get_ordered_scores_rank(ordered_scores);
   socket.emit('show_round_votes', ordered_scores_rank, round_scores);
+  socket.broadcast.emit('show_round_votes', ordered_scores_rank, round_scores);
 }
 
 

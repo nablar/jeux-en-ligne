@@ -276,12 +276,11 @@ socket.on('show_votes', function(players_list, teller_pseudo, chosen_cards, gues
     // Change title
     change_style_of_class("hide-after-vote", "display:none");
     if(leader) {
-        change_style_of_class("show-after-vote-for-leader", "");
+        change_style_of_class("show-after-vote-for-leader", "")
+        socket.emit('get_round_votes');
     }
     
     document.getElementById("title-after-vote").innerHTML = "Voici les résultats des votes";
-
-    socket.emit('get_round_votes');
     
     let card_list = document.getElementsByClassName("carte-d");
     // Show results of votes 
