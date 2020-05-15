@@ -110,6 +110,9 @@ img.reveal-teller-card{
 div.cards-container{
     margin-top:50px;
 }
+div.cards-container tr{
+  vertical-align: top;
+}
 table{
     margin: 0 auto;
 }
