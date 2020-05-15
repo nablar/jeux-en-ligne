@@ -407,16 +407,22 @@ socket.on('final_scores', function(winner, scores) {
         document.getElementById("winner-name").innerHTML="Les gagnants sont : " + winners_name;
     }
     
-    let ul = document.getElementById("players-scores-list");
+    let tbody = document.getElementById("final-scores-table-body");
     
-    while (ul.hasChildNodes()) {  
-        ul.removeChild(ul.firstChild);
-    }
+    for(let i=0; i<scores.length; i++){
+        let player_row = document.createElement("tr");
+        let rank = document.createElement("td");
+        rank.innerHTML = scores[i][0];
+        let pseudo = document.createElement("td");
+        pseudo.innerHTML = scores[i][1];
+        let score = document.createElement("td");
+        score.innerHTML = scores[i][2];
 
-    for (let i=0; i<scores.length ; i++) {
-        let li = document.createElement("li");
-        li.appendChild(document.createTextNode(scores[i][0] + " - " + scores[i][1] + " : " + scores[i][2] + " points"));
-        ul.appendChild(li);
+        player_row.appendChild(rank);
+        player_row.appendChild(pseudo);
+        player_row.appendChild(score);
+
+        tbody.appendChild(player_row);
     }
 });
 
@@ -472,6 +478,9 @@ function phrase_next_turn(players_list){
         if(Math.ceil((current_round_number+players_list.length)/players_list.length) == total_round_number){
             document.getElementById("next-turn-button").value = "Dernier tour !";
         }            
+    }
+    if(current_round_number == total_round_number * players_list.length) {
+        document.getElementById("next-turn-button").value = "Voir les gagnants !";
     }
 }
 
