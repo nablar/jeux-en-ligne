@@ -9,6 +9,9 @@ let defausse = []
 
 /** Charge les noms des fichiers dans le tableau "cartes" **/
 function chargerCartes(){
+	cartes = [];
+	pile = [];
+	defausse = [];
 	fs.readdirSync(cartesDossier).forEach(file => { // Lire les noms des fichiers de manière synchrone
 		cartes.push(cartesDossierNoRel+file);
 		pile.push(cartesDossierNoRel+file);
