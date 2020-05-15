@@ -14,7 +14,7 @@ let current_round_number = 0;  // contains the number of the current round
 let cards_can_be_selected = true;  // according to the moment in the game, cards can or cannot be selected
 let current_view;  // contains the letter corresponding to the current view
 let teller_chose = false;  // true if the teller already sent its card and phrase
-
+const notification_soud = new Audio('sounds/son_notification.ogg');
 
 
 
@@ -111,6 +111,7 @@ socket.on('new_teller', function(pseudo_teller) {
         c.innerHTML = "Tu es le conteur, choisis une carte et ta phrase.";
         change_style_of_class("hide-if-teller", "display:none"); 
         change_style_of_class("hide-if-not-teller", ""); 
+        notification_soud.play();
     } else {
         change_style_of_class("hide-if-not-teller", "display:none"); 
         change_style_of_class("hide-if-teller", ""); 
@@ -150,9 +151,10 @@ socket.on('reveal_teller_choice', function(card, key_phrase) {
     } else {
         change_style_of_class("hide-before-teller-choice", "");
         document.getElementById("teller").innerHTML = "";  
+        notification_soud.play();
+        window.scrollTo(0,0);
     }  
     teller_chose = true;
-
 });
 
 function cardToPlayChosen() {
@@ -436,7 +438,7 @@ socket.on('change_view', function(view, players_list) {
     document.getElementsByClassName("current-view")[0].classList.remove("current-view");
     document.getElementById("vue-"+view).classList.add("current-view");
     cards_can_be_selected = true; // New view : cards can be selected again
-    if(view === 'C'){
+    if(view === 'C') {
         // change round number on top left
         current_round_number += 1;
         phrase_next_turn(players_list);
@@ -451,8 +453,13 @@ socket.on('change_view', function(view, players_list) {
         resetConfirmationMessage(); // Réinitialiser le message de confirmation
         resetTellerPhrase(); // Réinitialiser la phrase du conteur
     }
-    else if(view === 'D' && teller){
-        cards_can_be_selected = false; // Block card selection
+    else if(view === 'D') {
+        if(teller){
+            cards_can_be_selected = false; // Block card selection
+        }
+        else{
+            notification_soud.play();            
+        }
     }
 
     // Display timer for views C and D

@@ -41,6 +41,14 @@ app.get('/', function(req, res) {
 	gestionServeur.reset();
 	res.writeHead(302, {'Location': '/'});
 	res.end("Done resetting");
+})
+.get('/sounds/:soundfile', function(req, res){    
+    if(req.params.soundfile.match(/^\w+\.ogg$/g)){
+        fs.readFile('sounds/'+req.params.soundfile, function(error, content) {
+            res.writeHead(200, {"Content-Type": "audio/ogg"});
+            res.end(content);
+        });
+    }
 });
 
 
