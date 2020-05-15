@@ -4,6 +4,7 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" href="../css/dixit.css" /> 
         <title>Dixit</title>
+        <link rel="shortcut icon" type="image/png" href="favicon.png"/>
     </head>
 
     <body>
@@ -104,8 +105,6 @@
             <p class="hide-if-not-leader show-after-vote-for-leader">
                 <input id="next-turn-button" type="submit" value="Conteur suivant !" onclick="socket.emit('next_turn');"/>
             </p>
-
-            <!--<input id="reveal-total-scores-button" class="hide-if-not-leader show-after-vote-for-leader" type="submit" value="Voir les scores" onclick="socket.emit('reveal_total_scores');"/> -->
 
             <div class="cards-container">
                 <table>
