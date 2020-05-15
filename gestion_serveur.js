@@ -177,35 +177,6 @@ function get_round_votes(socket){
   socket.emit('show_round_votes', ordered_scores_rank, round_scores);
 }
 
-/*
-function reveal_total_scores(socket){
-  // Compute scores
-  scores = computeScores();
-
-  // Check if game is finished
-  done_rounds+=1;
-  if(done_rounds == total_rounds * players.length) {
-    // Change view
-    socket.emit('change_view', "F", players);
-    socket.broadcast.emit('change_view', "F", players);
-
-    // Emit the final scores
-    let ordered_scores = get_ordered_scores();
-    let ordered_scores_rank = get_ordered_scores_rank(ordered_scores);
-    let winners = get_winners(ordered_scores);
-    socket.emit('final_scores', winners, ordered_scores_rank);
-    socket.broadcast.emit('final_scores', winners, ordered_scores_rank);
-
-  } else {
-    socket.emit('change_view', "E", players);
-    socket.broadcast.emit('change_view', "E", players);
-    // Emit the scores
-    let ordered_scores = get_ordered_scores();
-    let ordered_scores_rank = get_ordered_scores_rank(ordered_scores);
-    socket.emit('scores', ordered_scores_rank);
-    socket.broadcast.emit('scores', ordered_scores_rank);
-  }	
-}*/
 
 function guesser_choice(socket, card){
   if(!socket.pseudo){ return; }

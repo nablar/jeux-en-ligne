@@ -281,12 +281,6 @@ socket.on('show_votes', function(players_list, teller_pseudo, chosen_cards, gues
 
     socket.emit('get_round_votes');
     
-    /*
-    // Show button to reveal scores for the leader
-    if(leader) {
-        document.getElementById("reveal-total-scores-button").style="";
-    }*/
-    
     let card_list = document.getElementsByClassName("carte-d");
     // Show results of votes 
     showVotesResults(card_list, players_list, guesses, teller_pseudo);
@@ -349,6 +343,7 @@ function showRoundVotes(ordered_scores_rank, round_scores) {
     let title = document.getElementById("title-after-vote");
     let table = document.createElement("table");
     table.id = "scores";
+    table.classList.add("scores-table");
 
     // header of table
     let thead = document.createElement("thead");
