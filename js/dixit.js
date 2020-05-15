@@ -145,6 +145,7 @@ socket.on('reveal_teller_choice', function(card, key_phrase) {
         change_style_of_class("hide-before-teller-choice", "");
         document.getElementsByClassName("teller")[0].innerHTML = "";  
         notification_soud.play();
+        window.scrollTo(0,0);
     }  
     teller_chose = true;
 });
