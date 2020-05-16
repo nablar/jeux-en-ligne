@@ -289,7 +289,7 @@ socket.on('show_votes', function(players_list, teller_pseudo, chosen_cards, gues
     showVotesResults(card_list, players_list, guesses, teller_pseudo);
 
     // Show who chose the cards
-    showCardsOwners(card_list, players_list, chosen_cards, teller_pseudo);
+    showCardsOwners(card_list, chosen_cards, teller_pseudo);
 });
 
 function showVotesResults(card_list, players_list, guesses, teller_pseudo) {
@@ -312,9 +312,10 @@ function showVotesResults(card_list, players_list, guesses, teller_pseudo) {
     }
 }
 
-function showCardsOwners(card_list, players_list, chosen_cards, teller_pseudo) {
-    for(let i=0; i<players_list.length; i++){
-        let name = players_list[i];
+function showCardsOwners(card_list, chosen_cards, teller_pseudo) {
+    let players_who_send_card = Object.keys(chosen_cards);
+    for(let i=0; i<players_who_send_card.length; i++){
+        let name = players_who_send_card[i];
         let card = chosen_cards[name];
 
         for(let j=0; j<card_list.length; j++) {

@@ -15,7 +15,7 @@ function computeScoresOneGame(players, guesses, cards, teller){
 		}
 		else{ // Règle 3)
 			playerOfChosenCard = whoPlayed(guesses[pseudo], cards);
-			if(pseudo != playerOfChosenCard){ // On ne vote pas pour sa propre carte
+			if(pseudo != playerOfChosenCard){ // On ne vote pas pour sa propre carte, Give points only if player is still connected
 				scores[playerOfChosenCard] += 1;
 			}
 		}
@@ -33,12 +33,19 @@ function computeScoresOneGame(players, guesses, cards, teller){
 			scores[who_found_teller_card[player]] += 3;
 		}
 	}
+	for(let player in scores) {
+		if(!players.includes(player)){ // Remove disconnected players from scores
+			delete scores[player];
+		}
+	}
 	return scores;
 }
 
 function computeTotalScores(players, guesses, cards, teller, scores){
 	let total_scores = scores || initScores(players); // argument optionnel
 	let game_scores = computeScoresOneGame(players, guesses, cards, teller);
+	console.log("game_scores ",game_scores);
+	console.log("total_scores ",total_scores);
 	for(let player in game_scores) {
 		total_scores[player] += game_scores[player];
 	}
