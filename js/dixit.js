@@ -441,6 +441,7 @@ socket.on('change_view', function(view, players_list) {
     document.getElementById("vue-"+view).classList.add("current-view");
     cards_can_be_selected = true; // New view : cards can be selected again
     if(view === 'C') {
+        showTitle("Voici ton jeu");
         // change round number on top left
         current_round_number += 1;
         phrase_next_turn(players_list);
@@ -456,6 +457,7 @@ socket.on('change_view', function(view, players_list) {
         resetTellerPhrase(); // Réinitialiser la phrase du conteur
     }
     else if(view === 'D') {
+        showTitle("Phase de votes");
         if(teller){
             cards_can_be_selected = false; // Block card selection
         }
@@ -594,5 +596,14 @@ function resetConfirmationMessage(){
 
 function resetTellerPhrase(){
     document.getElementById("phrase-clef-input-text").value = "";
+}
+
+function showTitle(title){
+    setTimeout( function() {
+        document.body.classList.remove("show-title");
+        document.body.setAttribute("title-text", "");
+    }, 3000); // Duration here must be the same as the animation duration in the css of body.show-title
+    document.body.setAttribute("title-text", title);
+    document.body.classList.add("show-title");
 }
 
