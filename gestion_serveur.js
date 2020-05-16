@@ -321,8 +321,24 @@ function disconnect(socket){
     players.splice(index,1);
     socket.broadcast.emit('players_list', players);
 
+    // Update scores 
+    if(scores !== undefined && socket.pseudo in scores) {
+      console.log("pseudo removed from scores");
+      delete scores[socket.pseudo];
+    }
 
+    // Update chosen_cards if card is still not displayed on the board game of all players, and if it is not the card of the teller
+    if(socket.pseudo != teller && socket.pseudo in chosen_cards && current_view == "C2") {
+      console.log("pseudo removed from chosen cards");
+      delete chosen_cards[socket.pseudo];
+    }
 
+    // Update guesses
+    if(socket.pseudo in guesses) {
+      console.log("pseudo removed from guesses");
+      delete guesses[socket.pseudo];
+    }
+    
 
     // Use new players list
     if(players.length == 0) {
@@ -339,7 +355,7 @@ function disconnect(socket){
     if(current_view == "C2" && Object.keys(chosen_cards).length==players.length){  // if view is second part of view C and everybody chose a card
       all_guesser_chose_card_to_play(socket);
     }
-    // Verify that other players aren't blocket in view C1
+    // Verify that other players aren't blocket in view D1
     if(current_view == "D1" && Object.keys(guesses).length == players.length-1){  // if everybody voted
       everybody_voted(socket);
     }
