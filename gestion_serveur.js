@@ -293,6 +293,7 @@ function pseudo(socket, pseudo){
 function disconnect(socket){
   if(socket.pseudo !== undefined) {
     console.log(socket.pseudo + " vient de se déconnecter.");
+    socket.broadcast.emit('message', socket.pseudo + " vient de se déconnecter.");
     let index;
     for(var i = 0 ; i < players.length ; i++) {
       if(socket.pseudo == players[i]) {
