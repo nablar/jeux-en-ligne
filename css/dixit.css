@@ -1,8 +1,13 @@
+@font-face {
+  font-family: custom-font;
+  src: url(../fonts/sitefont.otf);
+}
+
 body{
-    font-family: sans-serif;
-    background: #0B3861;
-    color:white;
-    text-align: center;
+  font-family: custom-font;
+  background: #0B3861;
+  color:white;
+  text-align: center;
 }
 #round-number, .phrase-clef, .teller-pseudo{
     color:#1983e6;

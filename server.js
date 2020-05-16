@@ -52,6 +52,14 @@ app.get('/', function(req, res) {
             res.end(content);
         });
     }
+})
+.get('/fonts/:fontfile', function(req, res){    
+    if(req.params.fontfile.match(/^\w+\.(o|t)tf$/g)){
+        fs.readFile('fonts/'+req.params.fontfile, function(error, content) {
+            res.writeHead(200, {"Content-Type": "application/octet-stream"});
+            res.end(content);
+        });
+    }
 });
 
 
