@@ -434,6 +434,22 @@ socket.on('redirect', function(destination) {
 
 
 /***************************** OTHER FUNCTIONS *****************************/
+// Use enter to submit pseudo 
+document.getElementById("pseudo-input").addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+   event.preventDefault();
+   sendPseudo();
+  }
+});
+
+// Use enter to submit key phrase from teller 
+document.getElementById("phrase-clef-input-text").addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+   event.preventDefault();
+   sendKeyPhrase();
+  }
+});
+
 
 socket.on('change_view', function(view, players_list) {
     current_view = view;
