@@ -8,7 +8,7 @@ let index_teller = 0;
 let chosen_cards={};
 let guesses={};
 let scores;
-let scores_disconnected_players;
+let last_game_scores;
 let total_rounds = 3;
 let done_rounds = 0;
 let a_defausser = [];
@@ -16,6 +16,8 @@ let timer_seconds = 120;
 let timer_seconds_teller = 180;
 let timer_seconds_vote = 180;
 let current_view = "B"; // equals B, C1, C2, D1, D2 or E
+let disconnected_players = {};
+let last_key_phrase = "";
 
 function get_winners(ordered_scores) {
   winners=[ordered_scores[0][0]];
@@ -105,14 +107,16 @@ function computeScores(){
 }
 
 function computeScoresOneGame(){
-  return gestionScores.computeScoresOneGame(players, guesses, chosen_cards, teller);
+	last_game_scores = gestionScores.computeScoresOneGame(players, guesses, chosen_cards, teller);
+  return last_game_scores;
 }
 
 function reset(){	
 	gestionCartes.chargerCartes();
 	a_defausser = [];
 	scores = null;
-  scores_disconnected_players = null;
+  disconnected_players = {};
+  last_game_scores = null;
 	players = [];
 	leader = ""; 
   teller = "";
@@ -140,7 +144,7 @@ function next_turn(socket){
 
 
   // Check if game is finished
-  done_rounds+=1;
+  done_rounds+=1;  
   if(done_rounds == total_rounds * players.length) {
     current_view = "E";
     // Change view
@@ -168,6 +172,11 @@ function next_turn(socket){
     // Start timer
     countdown(socket, timer_seconds_teller);
   } 
+  for(let pseudo in disconnected_players){
+  	if(disconnected_players[pseudo]['last_game_score']){
+  		delete disconnected_players[pseudo]['last_game_score'];
+  	}
+	}    
 }
 
 
@@ -201,6 +210,11 @@ function everybody_voted(socket) {
   stopCountdown();
   socket.emit('show_votes', players, teller, chosen_cards, guesses);
   socket.broadcast.emit('show_votes', players, teller, chosen_cards, guesses);
+  for(let pseudo in disconnected_players){
+  	if(disconnected_players[pseudo]['guess']){
+  		delete disconnected_players[pseudo]['guess'];
+  	}
+	}    
 }
 
 function guesser_card_to_play(socket, card){
@@ -225,7 +239,11 @@ function all_guesser_chose_card_to_play(socket) {
   a_defausser = shuffle(a_defausser); // On mélange les cartes pour brouiller les pistes
   socket.emit('start_guessing', players.length, a_defausser);
   socket.broadcast.emit('start_guessing', players.length, a_defausser);
-    
+  for(let pseudo in disconnected_players){
+  	if(disconnected_players[pseudo]['chosen_card']){
+  		delete disconnected_players[pseudo]['chosen_card'];
+  	}
+	}    
   // Start timer
   countdown(socket, timer_seconds_vote);
 }
@@ -236,6 +254,7 @@ function teller_choice(socket, card, key_phrase){
 	card = cleanCardName(card);
   chosen_cards[teller] = card;
   a_defausser.push(card);
+  last_key_phrase = key_phrase;
   socket.main.splice(socket.main.indexOf(card), 1);
   socket.emit('reveal_teller_choice', card, key_phrase);
   socket.broadcast.emit('reveal_teller_choice', card, key_phrase);
@@ -293,13 +312,58 @@ function pseudo(socket, pseudo){
     socket.emit('new_leader', leader);
     players.push(pseudo);
 
-    socket.emit('change_view', "B", players);
+    if(!(pseudo in disconnected_players)){
+    	socket.emit('change_view', "B", players);
+    }
     socket.emit('players_list', players);
     // Send new player name to other players
     socket.broadcast.emit('players_list', players);
 
     // Send number of rounds
     socket.emit('send_total_round_number', total_rounds);
+    if(pseudo in disconnected_players){
+    	socket.main = disconnected_players[pseudo]['jeu'];
+	    scores[pseudo] = 0;
+    	if(disconnected_players[pseudo]['score'] !== undefined){
+    		scores[pseudo] = disconnected_players[pseudo]['score'];	
+    	}
+    	if(disconnected_players[pseudo]['last_game_score'] !== undefined){
+    		last_game_scores[pseudo] = disconnected_players[pseudo]['last_game_score'];	
+    	}
+    	else{
+    		last_game_scores[pseudo] = 0;	
+    	}
+    	if(disconnected_players[pseudo]['guess'] !== undefined){
+    		guesses[pseudo] = disconnected_players[pseudo]['guess'];
+    	}
+    	if(disconnected_players[pseudo]['chosen_card'] !== undefined){
+    		chosen_cards[pseudo] = disconnected_players[pseudo]['chosen_card'];	
+    	}
+    	if(current_view == "C2" && Object.keys(chosen_cards).length == players.length){  // if view is second part of view C and everybody chose a card
+      	all_guesser_chose_card_to_play(socket);
+    	}
+	    // Verify that other players aren't blocket in view D1
+	    else if(current_view == "D1" && Object.keys(guesses).length == players.length-1){  // if everybody voted
+	      everybody_voted(socket);
+	    }
+	    else {
+	    	socket.emit('change_view', current_view[0], players);
+  			socket.emit('new_teller', teller);
+	    	if(current_view === 'C2') {
+  				socket.emit('reveal_teller_choice', chosen_cards[teller], last_key_phrase);
+	    	}
+	    	else if(current_view === 'D1'){
+  				socket.emit('reveal_teller_choice', chosen_cards[teller], last_key_phrase);
+  				socket.emit('start_guessing', players.length, a_defausser);
+	    	}
+	    	else if(current_view === 'D2'){
+				  socket.emit('show_round_votes', get_ordered_scores_rank(get_ordered_scores()), last_game_scores);
+				  socket.broadcast.emit('show_round_votes', get_ordered_scores_rank(get_ordered_scores()), last_game_scores);
+	    	}
+    	}
+    	delete disconnected_players[pseudo];
+    }
+    console.log('disconnected_players: ', disconnected_players);
   }
   else {
     socket.emit('message', "Ce pseudo est déjà pris, choisis-en un autre.")
@@ -310,6 +374,10 @@ function disconnect(socket){
   if(socket.pseudo !== undefined) {
     console.log(socket.pseudo + " vient de se déconnecter.");
     socket.broadcast.emit('message', socket.pseudo + " vient de se déconnecter.");
+    disconnected_players[socket.pseudo] = {};
+    if(socket.main!==undefined){
+    	disconnected_players[socket.pseudo]['jeu'] = socket.main;
+    }
 
     // Update players list
     let index;
@@ -323,18 +391,27 @@ function disconnect(socket){
 
     // Update scores 
     if(scores !== undefined && socket.pseudo in scores) {
+    	disconnected_players[socket.pseudo]['score'] = scores[socket.pseudo];
       console.log("pseudo removed from scores");
       delete scores[socket.pseudo];
+    }
+
+    if(last_game_scores !== undefined && socket.pseudo in last_game_scores) {
+    	disconnected_players[socket.pseudo]['last_game_score'] = last_game_scores[socket.pseudo];
+      console.log("pseudo removed from last game scores");
+      delete last_game_scores[socket.pseudo];
     }
 
     // Update chosen_cards if card is still not displayed on the board game of all players, and if it is not the card of the teller
     if(socket.pseudo != teller && socket.pseudo in chosen_cards && current_view == "C2") {
       console.log("pseudo removed from chosen cards");
+      disconnected_players[socket.pseudo]['chosen_card'] = chosen_cards[socket.pseudo];
       delete chosen_cards[socket.pseudo];
     }
 
     // Update guesses
     if(socket.pseudo in guesses) {
+    	disconnected_players[socket.pseudo]['guess'] = guesses[socket.pseudo];
       console.log("pseudo removed from guesses");
       delete guesses[socket.pseudo];
     }
@@ -359,6 +436,7 @@ function disconnect(socket){
     if(current_view == "D1" && Object.keys(guesses).length == players.length-1){  // if everybody voted
       everybody_voted(socket);
     }
+    console.log('disconnected_players: ', disconnected_players);
   }
 }
 

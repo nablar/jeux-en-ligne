@@ -176,7 +176,7 @@ let card_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !"
     "Espérons que ça passe !", "Les autres seront dupés !", "Ça passe ou ça casse !", "Bonne idée de se débarasser des cartes nulles !",
     "Même la carte du conteur est moins bien !", "Tout le monde va voter pour toi !"];
 let card_received_msg_second_part = ["Attendons les autres joueurs...", "Attendons les retardataires..." ,
-    "Ne soit pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
+    "Ne sois pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
     "Dommage que tout le monde ne soit pas aussi rapide que toi...", "Attends que les autres joueurs soient prêts...",
     "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu...", "Plus qu'à attendre les autres..."];
 
@@ -344,8 +344,10 @@ socket.on('show_round_votes', function(ordered_scores_rank, round_scores) {
 
 function showRoundVotes(ordered_scores_rank, round_scores) {    
     cards_can_be_selected = false; // Block card selection
+    clearScoresTable();
     let title = document.getElementById("title-after-vote");
     let table = document.createElement("table");
+
     table.id = "scores";
     table.classList.add("scores-table");
 
@@ -457,6 +459,7 @@ socket.on('change_view', function(view, players_list) {
     document.getElementById("vue-"+view).classList.add("current-view");
     cards_can_be_selected = true; // New view : cards can be selected again
     if(view === 'C') {
+        showTitle("Voici ton jeu");
         // change round number on top left
         current_round_number += 1;
         phrase_next_turn(players_list);
@@ -472,6 +475,7 @@ socket.on('change_view', function(view, players_list) {
         resetTellerPhrase(); // Réinitialiser la phrase du conteur
     }
     else if(view === 'D') {
+        showTitle("Phase de votes");
         if(teller){
             cards_can_be_selected = false; // Block card selection
         }
@@ -610,5 +614,14 @@ function resetConfirmationMessage(){
 
 function resetTellerPhrase(){
     document.getElementById("phrase-clef-input-text").value = "";
+}
+
+function showTitle(title){
+    setTimeout( function() {
+        document.body.classList.remove("show-title");
+        document.body.setAttribute("title-text", "");
+    }, 3000); // Duration here must be the same as the animation duration in the css of body.show-title
+    document.body.setAttribute("title-text", title);
+    document.body.classList.add("show-title");
 }
 
