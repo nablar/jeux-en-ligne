@@ -176,7 +176,7 @@ let card_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !"
     "Espérons que ça passe !", "Les autres seront dupés !", "Ça passe ou ça casse !", "Bonne idée de se débarasser des cartes nulles !",
     "Même la carte du conteur est moins bien !", "Tout le monde va voter pour toi !"];
 let card_received_msg_second_part = ["Attendons les autres joueurs...", "Attendons les retardataires..." ,
-    "Ne soit pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
+    "Ne sois pas trop fâché contre les retardataires...", "Laisse encore un peu de temps à tes camarades...",
     "Dommage que tout le monde ne soit pas aussi rapide que toi...", "Attends que les autres joueurs soient prêts...",
     "Les autres ne sont pas aussi rapides...", "Les autres trainent un peu...", "Plus qu'à attendre les autres..."];
 
@@ -344,8 +344,10 @@ socket.on('show_round_votes', function(ordered_scores_rank, round_scores) {
 
 function showRoundVotes(ordered_scores_rank, round_scores) {    
     cards_can_be_selected = false; // Block card selection
+    clearScoresTable();
     let title = document.getElementById("title-after-vote");
     let table = document.createElement("table");
+
     table.id = "scores";
     table.classList.add("scores-table");
 
