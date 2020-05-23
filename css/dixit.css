@@ -15,11 +15,7 @@ body{
 .phrase-clef{
     font-style: italic;
 }
-#round-indication {
-    position:absolute;
-    top:0;
-    left:0;
-}
+
 #top-right-teller {
     position:absolute;
     top:0;
@@ -244,14 +240,17 @@ body.show-title:after{
   padding: 8px 8px 8px 32px;
   text-decoration: none;
   font-size: 25px;
-  color: #818181;
+  color: white;
   display: block;
   transition: 0.3s;
 }
-
-/* When you mouse over the navigation links, change their color */
-.sidenav a:hover {
-  color: #f1f1f1;
+.subnav-text {
+    padding: 4px 4px 4px 16px;
+    text-decoration: none;
+    font-size: 15px;
+    color: white;
+    display: block;
+    transition: 0.3s;
 }
 
 /* Position and style the close button (top right corner) */
@@ -270,9 +269,11 @@ body.show-title:after{
 }
 
 
+
+
 .bar{
-  width: 35px;
-  height: 5px;
+  width: 30px;
+  height: 4px;
   background-color: white;
   margin: 6px 0;
   transition: 0.4s;

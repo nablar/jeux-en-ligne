@@ -25,9 +25,31 @@ function sendPseudo() {
     pseudo = document.getElementById("pseudo-input").value;
     socket.emit('pseudo', pseudo);
     document.getElementById("pseudo").innerHTML = "Bienvenue " + pseudo + " !";
+    document.getElementById("sidenav-pseudo").innerHTML = "Pseudo : " + pseudo;
+}
+
+let show_subnav_scores = false;
+function subnav_scores() {
+    if (!show_subnav_scores) {
+        document.getElementById("subnav-content-scores").style.display = "block";
+        show_subnav_scores = true;
+    } else {
+        document.getElementById("subnav-content-scores").style.display = "none";
+        show_subnav_scores = false;
+    }
 }
 
 
+let show_subnav_tellers = false;
+function subnav_tellers() {
+    if (!show_subnav_tellers) {
+        document.getElementById("subnav-content-tellers").style.display = "block";
+        show_subnav_tellers = true;
+    } else {
+        document.getElementById("subnav-content-tellers").style.display = "none";
+        show_subnav_tellers = false;
+    }
+}
 
 
 /***************************** VUE B *****************************/
