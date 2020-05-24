@@ -27,6 +27,7 @@ body{
     right:0;
     left:0;
     font-weight: bold;
+    z-index: -1;
 }
 
 .tooltip{
@@ -237,13 +238,15 @@ body.show-title:after{
 
 /* The navigation menu links */
 .sidenav a {
-  padding: 8px 8px 8px 32px;
+  padding: 8px 8px 8px 8px;
   text-decoration: none;
   font-size: 25px;
   color: white;
   display: block;
   transition: 0.3s;
+  cursor:default;
 }
+
 .subnav-text {
     padding: 4px 4px 4px 16px;
     text-decoration: none;
@@ -251,6 +254,15 @@ body.show-title:after{
     color: white;
     display: block;
     transition: 0.3s;
+}
+.subnavbtn:hover {
+    cursor:pointer;
+}
+.subnav:hover {
+    cursor:pointer;
+}
+.closebtn:hover {
+    cursor:pointer !important;
 }
 
 /* Position and style the close button (top right corner) */
@@ -271,7 +283,7 @@ body.show-title:after{
 
 
 
-.bar{
+.bar {
   width: 30px;
   height: 4px;
   background-color: white;
@@ -279,4 +291,11 @@ body.show-title:after{
   transition: 0.4s;
 }
 
+#hamburger-icon {
+    width: fit-content;
+}
+
+#hamburger-icon:hover {
+    cursor:pointer;
+}
 /* End : The side navigation menu */
