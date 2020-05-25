@@ -120,7 +120,16 @@ io.sockets.on('connection', function (socket, pseudo) {
 
     socket.on('next_game', function() {
       gestionServeur.next_game(socket);
-    })
+    });
+
+    socket.on('show_sidenav_tellers', function() {
+      gestionServeur.show_sidenav_tellers(socket);
+    });
+
+    socket.on('show_sidenav_scores', function() {
+      gestionServeur.show_sidenav_scores(socket);
+    });
+
 });
 
 

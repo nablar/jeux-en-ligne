@@ -75,3 +75,4 @@ function sortNumber(a,b) {
 
 exports.computeScoresOneGame = computeScoresOneGame;
 exports.computeTotalScores = computeTotalScores;
+exports.initScores = initScores;

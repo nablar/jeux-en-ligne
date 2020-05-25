@@ -28,28 +28,7 @@ function sendPseudo() {
     document.getElementById("sidenav-pseudo").innerHTML = "Pseudo : " + pseudo;
 }
 
-let show_subnav_scores = false;
-function subnav_scores() {
-    if (!show_subnav_scores) {
-        document.getElementById("subnav-content-scores").style.display = "block";
-        show_subnav_scores = true;
-    } else {
-        document.getElementById("subnav-content-scores").style.display = "none";
-        show_subnav_scores = false;
-    }
-}
 
-
-let show_subnav_tellers = false;
-function subnav_tellers() {
-    if (!show_subnav_tellers) {
-        document.getElementById("subnav-content-tellers").style.display = "block";
-        show_subnav_tellers = true;
-    } else {
-        document.getElementById("subnav-content-tellers").style.display = "none";
-        show_subnav_tellers = false;
-    }
-}
 
 
 /***************************** VUE B *****************************/
@@ -467,7 +446,82 @@ function closeNav() {
   document.getElementById("mySidenav").style.width = "0";
 }
 
+let show_subnav_scores = false;
+function sidenav_scores() {
+    if (!show_subnav_scores) {
+        socket.emit('show_sidenav_scores');
+        document.getElementById("subnav-content-scores").style.display = "block";
+        show_subnav_scores = true;
+    } else {
+        document.getElementById("subnav-content-scores").style.display = "none";
+        show_subnav_scores = false;
+        remove_sidenav_scores();
+    }
+}
 
+function remove_sidenav_scores() {
+    let table_body = document.getElementById("subnav-scores-table-body");
+    while (table_body.hasChildNodes()) {  
+        table_body.removeChild(table_body.firstChild);
+    }
+}
+
+socket.on('send_sidenav_scores', function(scores) {
+    let tbody = document.getElementById("subnav-scores-table-body");
+    
+    for(let i=0; i<scores.length; i++){
+        let player_row = document.createElement("tr");
+        let rank = document.createElement("td");
+        rank.innerHTML = scores[i][0];
+        let pseudo = document.createElement("td");
+        pseudo.innerHTML = scores[i][1];
+        let score = document.createElement("td");
+        score.innerHTML = scores[i][2];
+
+        player_row.appendChild(rank);
+        player_row.appendChild(pseudo);
+        player_row.appendChild(score);
+
+        tbody.appendChild(player_row);
+    }
+});
+
+
+let show_subnav_tellers = false;
+function sidenav_tellers() {
+    if (!show_subnav_tellers) {
+        socket.emit('show_sidenav_tellers');
+        document.getElementById("subnav-content-tellers").style.display = "block";
+        show_subnav_tellers = true;
+    } else {
+        document.getElementById("subnav-content-tellers").style.display = "none";
+        show_subnav_tellers = false;
+        remove_sidenav_tellers();
+    }
+}
+
+function remove_sidenav_tellers() {
+    let subnav_tellers = document.getElementById("subnav-content-tellers");
+    while (subnav_tellers.hasChildNodes()) {  
+        subnav_tellers.removeChild(subnav_tellers.firstChild);
+    }
+}
+
+socket.on('send_sidenav_tellers', function(players, teller) {
+    let subnav_tellers = document.getElementById("subnav-content-tellers");
+    
+    for (let i=0; i<players.length ; i++) {
+        let player = document.createElement("div");
+        player.appendChild(document.createTextNode(players[i]));
+        player.classList.add("subnav-text");        
+        if(players[i] != teller){ // if not the teller
+            player.classList.add("subnav-guesser");
+        } else {
+            player.classList.add("subnav-teller");
+        }
+        subnav_tellers.appendChild(player);
+    }
+});
 
 
 /***************************** OTHER FUNCTIONS *****************************/

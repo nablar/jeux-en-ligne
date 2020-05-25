@@ -232,6 +232,7 @@ body.show-title:after{
   left: 0;
   background-color: #111; /* Black*/
   overflow-x: hidden; /* Disable horizontal scroll */
+  overflow-y:scroll;
   padding-top: 60px; /* Place content 60px from the top */
   transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
 }
@@ -254,6 +255,7 @@ body.show-title:after{
     color: white;
     display: block;
     transition: 0.3s;
+    cursor:default;
 }
 .subnavbtn:hover {
     cursor:pointer;
@@ -273,6 +275,19 @@ body.show-title:after{
   font-size: 36px;
   margin-left: 50px;
 }
+
+.subnav-guesser {
+    color:#B8B8B8;
+}
+.subnav-teller {
+    font-weight: bold;
+    color:#1469b8;
+}
+
+#subnav-content-tellers {
+    margin-bottom:75px;
+}
+
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {

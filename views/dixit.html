@@ -23,20 +23,23 @@
           <a href="#pseudo" id="sidenav-pseudo">Pseudo : </a>
           <a href="#tour" id="round-indication">Tour : <span id="current-round-number"></span>/<span id="total-round-number"></span></a>
           <div class="subnav" >
-            <a class="subnavbtn" onclick="subnav_scores()">Scores <i class="fa fa-caret-down"></i></a>
+            <a class="subnavbtn" onclick="sidenav_scores()">Scores <i class="fa fa-caret-down"></i></a>
             <div class="subnav-content" id="subnav-content-scores" style="display:none">
-              <div class="subnav-text">personne1</div>
-              <div class="subnav-text">personne2</div>
-              <div class="subnav-text">personne3</div>
+                <table id="subnav-scores-table" class="scores-table">
+                    <thead> 
+                        <tr>
+                            <th>Rang</th>
+                            <th>Pseudo</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subnav-scores-table-body"></tbody>
+                </table>
             </div>
           </div>
           <div class="subnav">
-            <a class="subnavbtn" onclick="subnav_tellers()">Conteurs <i class="fa fa-caret-down"></i></a>
-            <div class="subnav-content" id="subnav-content-tellers" style="display:none">
-                <div class="subnav-text">conteur1</div>
-                <div class="subnav-text">conteur2</div>
-                <div class="subnav-text">conteur3</div>
-            </div>
+            <a class="subnavbtn" onclick="sidenav_tellers()">Conteurs <i class="fa fa-caret-down"></i></a>
+            <div class="subnav-content" id="subnav-content-tellers" style="display:none"></div>
           </div>
         </div>
 
