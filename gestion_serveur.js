@@ -441,6 +441,7 @@ function disconnect(socket){
 }
 
 function start_game(socket) {
+  scores = gestionScores.initScores(players);
   current_view = "C1";
   socket.emit('change_view', "C", players);
   socket.broadcast.emit('change_view', "C", players);
@@ -455,6 +456,16 @@ function start_game(socket) {
 function next_game(socket) {
   socket.emit('redirect', "/reset");
   socket.broadcast.emit('redirect', "/reset");
+}
+
+function show_sidenav_tellers(socket) {
+  socket.emit('send_sidenav_tellers', players, teller);
+}
+
+function show_sidenav_scores(socket) {
+  let ordered_scores = get_ordered_scores();
+  let ordered_scores_rank = get_ordered_scores_rank(ordered_scores);
+  socket.emit('send_sidenav_scores', ordered_scores_rank);
 }
 
 /* Functions exports */
@@ -485,6 +496,8 @@ exports.disconnect = disconnect;
 exports.start_game = start_game;
 exports.countdown = countdown;
 exports.next_game = next_game;
+exports.show_sidenav_tellers = show_sidenav_tellers;
+exports.show_sidenav_scores = show_sidenav_scores;
 
 /* Variables  exports*/
 exports.players = players;

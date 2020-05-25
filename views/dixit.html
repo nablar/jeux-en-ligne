@@ -5,14 +5,51 @@
         <link rel="stylesheet" href="../css/dixit.css" /> 
         <title>Dixit</title>
         <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+        <!-- Load font awesome icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
 
     <body>
-        <div id="round-indication" class="reveal-after-start" style="display:none">Tour : <span id="current-round-number"></span>/<span id="total-round-number"></span></div>
+        <!--<div id="round-indication" class="reveal-after-start" style="display:none">Tour : <span id="current-round-number"></span>/<span id="total-round-number"></span></div>-->
         <div id="top-right-teller" class="reveal-after-start" style="display:none"></div>
         <div id="top-middle-timer" style="display:none"></div>
 
         <div id="snackbar"></div>
+
+
+
+        <div id="mySidenav" class="sidenav">
+          <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+          <a href="#pseudo" id="sidenav-pseudo">Pseudo : </a>
+          <a href="#tour" id="round-indication">Tour : <span id="current-round-number"></span>/<span id="total-round-number"></span></a>
+          <div class="subnav" >
+            <a class="subnavbtn" onclick="sidenav_scores()">Scores   <i class="fa fa-caret-down"></i></a>
+            <div class="subnav-content" id="subnav-content-scores" style="display:none">
+                <table id="subnav-scores-table" class="scores-table">
+                    <thead> 
+                        <tr>
+                            <th>Rang</th>
+                            <th>Pseudo</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subnav-scores-table-body"></tbody>
+                </table>
+            </div>
+          </div>
+          <div class="subnav">
+            <a class="subnavbtn" onclick="sidenav_tellers()">Conteurs   <i class="fa fa-caret-down"></i></a>
+            <div class="subnav-content" id="subnav-content-tellers" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- Use to open the sidenav -->
+        <div class="container reveal-after-start" id="hamburger-icon" onclick="openNav()" style="display:none">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+
 
         <!-- VUE A : choix du pseudo -->
         <div id="vue-A" class="current-view vue">
