@@ -98,6 +98,8 @@ socket.on('tirage', function(cartes){
 });
 
 socket.on('new_teller', function(pseudo_teller) {
+    closeNav(); // close sidenav if open to reinitialize teller at next opening
+
     document.getElementById("top-right-teller").innerHTML = "Conteur : " + pseudo_teller;
     teller_chose = false;
     // Re initialize
@@ -276,6 +278,8 @@ function populatePlateau(nbJoueurs, cartes){
 
 /***************************** VUE D - 2nd part : display votes *****************************/
 socket.on('show_votes', function(players_list, teller_pseudo, chosen_cards, guesses) {
+    closeNav(); // close sidenav if open to reinitialize scores at next opening
+
     // Change title
     change_style_of_class("hide-after-vote", "display:none");
     if(leader) {
@@ -436,6 +440,8 @@ socket.on('redirect', function(destination) {
 
 
 /***************************** SIDE BAR MENU *****************************/
+let show_subnav_scores = false;
+let show_subnav_tellers = false;
 /* Set the width of the side navigation to 250px */
 function openNav() {
   document.getElementById("mySidenav").style.width = "250px";
@@ -443,20 +449,27 @@ function openNav() {
 
 /* Set the width of the side navigation to 0 */
 function closeNav() {
-  document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("mySidenav").style.width = "0";
+    // Close scores and tellers
+    close_sidenav_scores();
+    close_sidenav_tellers();
 }
 
-let show_subnav_scores = false;
+
 function sidenav_scores() {
     if (!show_subnav_scores) {
         socket.emit('show_sidenav_scores');
         document.getElementById("subnav-content-scores").style.display = "block";
         show_subnav_scores = true;
     } else {
-        document.getElementById("subnav-content-scores").style.display = "none";
-        show_subnav_scores = false;
-        remove_sidenav_scores();
+        close_sidenav_scores();
     }
+}
+
+function close_sidenav_scores() {
+    document.getElementById("subnav-content-scores").style.display = "none";
+    show_subnav_scores = false;
+    remove_sidenav_scores();
 }
 
 function remove_sidenav_scores() {
@@ -487,17 +500,20 @@ socket.on('send_sidenav_scores', function(scores) {
 });
 
 
-let show_subnav_tellers = false;
 function sidenav_tellers() {
     if (!show_subnav_tellers) {
         socket.emit('show_sidenav_tellers');
         document.getElementById("subnav-content-tellers").style.display = "block";
         show_subnav_tellers = true;
     } else {
-        document.getElementById("subnav-content-tellers").style.display = "none";
-        show_subnav_tellers = false;
-        remove_sidenav_tellers();
+        close_sidenav_tellers();
     }
+}
+
+function close_sidenav_tellers() {
+    document.getElementById("subnav-content-tellers").style.display = "none";
+    show_subnav_tellers = false;
+    remove_sidenav_tellers();
 }
 
 function remove_sidenav_tellers() {
