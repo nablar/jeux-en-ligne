@@ -230,7 +230,7 @@ body.show-title:after{
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   left: 0;
-  background-color: #111; /* Black*/
+  background-color: #1A1A1A; 
   overflow-x: hidden; /* Disable horizontal scroll */
   overflow-y:scroll;
   padding-top: 60px; /* Place content 60px from the top */
