@@ -11,8 +11,18 @@
 
     <body>
         <!--<div id="round-indication" class="reveal-after-start" style="display:none">Tour : <span id="current-round-number"></span>/<span id="total-round-number"></span></div>-->
-        <div id="top-right-teller" class="reveal-after-start" style="display:none"></div>
-        <div id="top-middle-timer" style="display:none"></div>
+        <div>
+            <div id="top-right-teller" class="reveal-after-start" style="display:none"></div>
+
+            <div id="top-middle-timer" style="display:none"></div>
+
+            <!-- Use to open the sidenav -->
+            <div class="container reveal-after-start" id="hamburger-icon" onclick="openNav()" style="display:none">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+            </div>
+        </div>
 
         <div id="snackbar"></div>
 
@@ -43,12 +53,7 @@
           </div>
         </div>
 
-        <!-- Use to open the sidenav -->
-        <div class="container reveal-after-start" id="hamburger-icon" onclick="openNav()" style="display:none">
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
-        </div>
+        
 
 
         <!-- VUE A : choix du pseudo -->

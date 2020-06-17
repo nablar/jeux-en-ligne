@@ -308,6 +308,8 @@ body.show-title:after{
 
 #hamburger-icon {
     width: fit-content;
+    position:fixed;
+    top:0;
 }
 
 #hamburger-icon:hover {
