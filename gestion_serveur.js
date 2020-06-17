@@ -15,9 +15,10 @@ let a_defausser = [];
 let timer_seconds = 120;
 let timer_seconds_teller = 180;
 let timer_seconds_vote = 180;
-let current_view = "B"; // equals B, C1, C2, D1, D2 or E
+let current_view = "B"; // values : B, C1, C2, D1, D2 and E
 let disconnected_players = {};
 let last_key_phrase = "";
+let players_done_list=[];  // list of players who played and are not waited
 
 function get_winners(ordered_scores) {
   winners=[ordered_scores[0][0]];
@@ -165,6 +166,12 @@ function next_turn(socket){
     socket.emit('new_teller', teller);
     socket.broadcast.emit('new_teller', teller);
 
+    // Re initialize variables
+    players_done_list=[teller];
+    let players_waiting_list = get_waiting_list();
+    socket.emit('players_waiting_list', players_waiting_list);
+    socket.broadcast.emit('players_waiting_list', players_waiting_list);
+
     // Change view
     socket.emit('change_view', "C", players);
     socket.broadcast.emit('change_view', "C", players);
@@ -203,6 +210,12 @@ function guesser_choice(socket, card){
   
   if(Object.keys(guesses).length == players.length-1){  // if everybody voted
     everybody_voted(socket);
+  } else {
+    // update waiting list
+    players_done_list.push(socket.pseudo);
+    let players_waiting_list = get_waiting_list();
+    socket.emit('players_waiting_list', players_waiting_list);
+    socket.broadcast.emit('players_waiting_list', players_waiting_list);
   }
 }
 function everybody_voted(socket) {
@@ -217,11 +230,23 @@ function everybody_voted(socket) {
 	}    
 }
 
-function guesser_card_to_play(socket, card){
-  if(!socket.pseudo || !socket.main){ return; }
+function get_waiting_list() {
+  let waiting_list=[];
+  for(let i=0; i<players.length; i++) {
+    pseudo = players[i];
+    if(!players_done_list.includes(pseudo)) {
+      waiting_list.push(pseudo);
+    }
+  }  
+  console.log("waiting list " + waiting_list);
+  return waiting_list;
+}
+
+function guesser_card_to_play(socket, card) {
+  if(!socket.pseudo || !socket.main) { return; }
 	card = cleanCardName(card);
   chosen_cards[socket.pseudo]=card;
-  console.log(socket.pseudo +" a chosi la carte "+card);
+  console.log(socket.pseudo +" a choisi la carte "+card);
   socket.main.splice(socket.main.indexOf(card), 1);
   a_defausser.push(card);
   if(Object.keys(chosen_cards).length==players.length){  // if everybody chose a card
@@ -231,12 +256,20 @@ function guesser_card_to_play(socket, card){
   }
 }
 
+
 function all_guesser_chose_card_to_play(socket) {
   current_view = "D1";
   stopCountdown();
   socket.emit('change_view', "D", players);
   socket.broadcast.emit('change_view', "D", players);
   a_defausser = shuffle(a_defausser); // On mélange les cartes pour brouiller les pistes
+
+  // Initialize list of players who are waited to vote
+  players_done_list=[teller];
+  let players_waiting_list = get_waiting_list();
+  socket.emit('players_waiting_list', players_waiting_list);
+  socket.broadcast.emit('players_waiting_list', players_waiting_list);
+
   socket.emit('start_guessing', players.length, a_defausser);
   socket.broadcast.emit('start_guessing', players.length, a_defausser);
   for(let pseudo in disconnected_players){

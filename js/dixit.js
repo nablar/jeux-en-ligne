@@ -202,7 +202,7 @@ function cardSelected(id){
 
 
 /***************************** VUE D - 1st part : send votes *****************************/
-socket.on('start_guessing', function(nbJoueurs, cartes){
+socket.on('start_guessing', function(nbJoueurs, cartes) {
     clearPlateau(); // supprimer les cartes du tour précédent
     populatePlateau(nbJoueurs, cartes);
 });
@@ -274,6 +274,19 @@ function populatePlateau(nbJoueurs, cartes){
     }
 }
 
+socket.on('players_waiting_list', function(waiting_list) {
+    let ul_waiting_list = document.getElementById("list-of-players-who-did-not-vote");
+    while (ul_waiting_list.hasChildNodes()) {  
+        ul_waiting_list.removeChild(ul_waiting_list.firstChild);
+    }
+
+    for (let i=0; i<waiting_list.length ; i++) {
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode(waiting_list[i]));
+        ul_waiting_list.appendChild(li);
+    }
+
+});
 
 
 /***************************** VUE D - 2nd part : display votes *****************************/
