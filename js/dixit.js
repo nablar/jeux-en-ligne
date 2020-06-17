@@ -205,6 +205,9 @@ function cardSelected(id){
 socket.on('start_guessing', function(nbJoueurs, cartes) {
     clearPlateau(); // supprimer les cartes du tour précédent
     populatePlateau(nbJoueurs, cartes);
+
+    // Show waiting list
+    document.getElementById("show-who-did-not-vote").style="";
 });
 
 let vote_received_msg_first_part = ["Bien noté !", "Bien choisi !", "Parfait !", "Bien !", "D'accord !", "Drôle de choix !",
@@ -292,6 +295,9 @@ socket.on('players_waiting_list', function(waiting_list) {
 /***************************** VUE D - 2nd part : display votes *****************************/
 socket.on('show_votes', function(players_list, teller_pseudo, chosen_cards, guesses) {
     closeNav(); // close sidenav if open to reinitialize scores at next opening
+
+    // Remove waiting list
+    document.getElementById("show-who-did-not-vote").style="display:none";
 
     // Change title
     change_style_of_class("hide-after-vote", "display:none");

@@ -238,7 +238,6 @@ function get_waiting_list() {
       waiting_list.push(pseudo);
     }
   }  
-  console.log("waiting list " + waiting_list);
   return waiting_list;
 }
 
