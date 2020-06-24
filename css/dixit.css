@@ -130,6 +130,16 @@ table{
     font-size: 25px;
 }
 
+
+#list-of-players-who-did-not-vote {
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+
+
+
 /* Titles indicating the current phase */
 
 body.show-title:after{
