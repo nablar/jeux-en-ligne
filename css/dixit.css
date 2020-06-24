@@ -130,6 +130,19 @@ table{
     font-size: 25px;
 }
 
+
+ul.waiting-players-list {
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+
+
+
+
+
+
 /* Titles indicating the current phase */
 
 body.show-title:after{
@@ -308,6 +321,8 @@ body.show-title:after{
 
 #hamburger-icon {
     width: fit-content;
+    position:fixed;
+    top:0;
 }
 
 #hamburger-icon:hover {
