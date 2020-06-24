@@ -76,6 +76,16 @@ function sendRoundNumber() {
     }
 }
 
+// For the leader to send the time for the timer
+function sendTimerTime(type) {
+    let time = document.getElementById(type+"-time-input").value;
+    if(time<=0) {
+        display_message_snackbar("Tu dois choisir un nombre strictement positif !");
+    } else {
+        socket.emit("timer_time_choice", time, type);
+    }
+}
+
 // For players to receive the total round number decided by the leader
 socket.on('send_total_round_number', function(number) {
     total_round_number = number;
@@ -84,6 +94,16 @@ socket.on('send_total_round_number', function(number) {
         round_number.innerHTML = number + " tour";
     } else {
         round_number.innerHTML = number + " tours";
+    }
+});
+
+socket.on('send_timer_time', function(time, type) {
+    time = time;
+    let timer_display = document.getElementById(type+"-time");
+    if(time==1) {
+        timer_display.innerHTML = time + " seconde";
+    } else {
+        timer_display.innerHTML = time + " secondes";
     }
 });
 

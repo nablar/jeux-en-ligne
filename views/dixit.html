@@ -60,6 +60,10 @@
                 <input type="text" id="pseudo-input" name="pseudo" placeholder="Pseudo" autofocus>
                 <input type="submit" value="Valider" onclick="sendPseudo()"/>
             </p> 
+
+            <p>
+                Ce jeu est optimisé pour les navigateurs Firefox et Chrome. Ne pas utiliser Internet Explorer.
+            </p>
         </div>
 
 
@@ -75,10 +79,53 @@
                 </br>
                 <label for="round-number-input">Nombre de tours</label>
                 <input type="number" min="1" max="20" id="round-number-input" name="round-number-input" value="3" onchange="sendRoundNumber()">
+                <h3>Temps pour choisir les cartes :</h3>
+                <table style="text-align: left;">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <label for="teller-time-input"><b>Conteur :</b></label>
+                            </td>
+                            <td style="padding-left: 15px;">
+                                <input type="number" min="20" max="360" id="teller-time-input" name="teller-time-input" value="180" onchange="sendTimerTime('teller')"> secondes
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="guesser-time-input"><b>Autres joueurs :</b></label>
+                            </td>
+                            <td style="padding-left: 15px;">
+                                <input type="number" min="20" max="360" id="guesser-time-input" name="guesser-time-input" value="120" onchange="sendTimerTime('guesser')"> secondes
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="vote-time-input"><b>Votes :</b></label>
+                            </td>
+                            <td style="padding-left: 15px;">
+                                <input type="number" min="20" max="360" id="vote-time-input" name="vote-time-input" value="120" onchange="sendTimerTime('vote')"> secondes
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             </br>
 
-            <div>Vous effectuerez <span id="round-number">3 tours</span>. <span class="tooltip">?<span class="tooltiptext">Lors d'un tour, tous les joueurs sont conteur une fois.</span></span></div>            
+            <div class="hide-if-leader">
+                <div>
+                    Vous effectuerez <span id="round-number">3 tours</span>. <span class="tooltip">?<span class="tooltiptext">Lors d'un tour, tous les joueurs sont conteur une fois.</span></span>
+                </div>  
+                </br>
+                <div>
+                    <b>Les temps pour chaque étape sont :</b>
+                    <ul class="no-bullet">
+                        <li> <span id="teller-time">180 secondes</span> pour le choix du conteur.</li>
+                        <li> <span id="guesser-time">120 secondes</span> pour le choix des autres joueurs.</li>
+                        <li> <span id="vote-time">120 secondes</span> pour les votes.</li>
+                    </ul>
+                </div>
+            </div>
+
             <div></div>
 
             </br>
