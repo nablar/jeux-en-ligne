@@ -167,10 +167,7 @@ function next_turn(socket){
     socket.broadcast.emit('new_teller', teller);
 
     // Re initialize variables
-    players_done_list=[teller];
-    let players_waiting_list = get_waiting_list();
-    socket.emit('players_waiting_list', players_waiting_list);
-    socket.broadcast.emit('players_waiting_list', players_waiting_list);
+    initialize_waiting_list(socket);
 
     // Change view
     socket.emit('change_view', "C", players);
@@ -212,10 +209,7 @@ function guesser_choice(socket, card){
     everybody_voted(socket);
   } else {
     // update waiting list
-    players_done_list.push(socket.pseudo);
-    let players_waiting_list = get_waiting_list();
-    socket.emit('players_waiting_list', players_waiting_list);
-    socket.broadcast.emit('players_waiting_list', players_waiting_list);
+    update_waiting_list(socket);
   }
 }
 function everybody_voted(socket) {
@@ -229,6 +223,22 @@ function everybody_voted(socket) {
   	}
 	}    
 }
+
+function initialize_waiting_list(socket) {
+  players_done_list = [teller];
+  let players_waiting_list = get_waiting_list();
+  socket.emit('players_waiting_list', players_waiting_list, current_view);
+  socket.broadcast.emit('players_waiting_list', players_waiting_list, current_view);
+}
+
+
+function update_waiting_list(socket) {
+  players_done_list.push(socket.pseudo);
+  let players_waiting_list = get_waiting_list();
+  socket.emit('players_waiting_list', players_waiting_list, current_view);
+  socket.broadcast.emit('players_waiting_list', players_waiting_list, current_view);
+}
+
 
 function get_waiting_list() {
   let waiting_list=[];
@@ -252,6 +262,9 @@ function guesser_card_to_play(socket, card) {
     all_guesser_chose_card_to_play(socket);
   } else {
     socket.emit('card_received');
+
+    // update waiting list
+    update_waiting_list(socket);
   }
 }
 
@@ -264,10 +277,7 @@ function all_guesser_chose_card_to_play(socket) {
   a_defausser = shuffle(a_defausser); // On mélange les cartes pour brouiller les pistes
 
   // Initialize list of players who are waited to vote
-  players_done_list=[teller];
-  let players_waiting_list = get_waiting_list();
-  socket.emit('players_waiting_list', players_waiting_list);
-  socket.broadcast.emit('players_waiting_list', players_waiting_list);
+  initialize_waiting_list(socket)
 
   socket.emit('start_guessing', players.length, a_defausser);
   socket.broadcast.emit('start_guessing', players.length, a_defausser);
@@ -290,6 +300,10 @@ function teller_choice(socket, card, key_phrase){
   socket.main.splice(socket.main.indexOf(card), 1);
   socket.emit('reveal_teller_choice', card, key_phrase);
   socket.broadcast.emit('reveal_teller_choice', card, key_phrase);
+
+  // Initialize list of players who are waited to choose their card
+  initialize_waiting_list(socket);
+
 
   // Restart timer
   countdown(socket, timer_seconds);

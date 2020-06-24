@@ -108,6 +108,9 @@ socket.on('new_teller', function(pseudo_teller) {
         change_style_of_class("show-after-vote-for-leader", "display:none");
     }
 
+    // Hide waiting list
+    document.getElementById("show-who-did-not-choose").style="display:none";
+
     let c = document.getElementById("teller");
     if(pseudo==pseudo_teller) {
         teller=true;
@@ -158,6 +161,9 @@ socket.on('reveal_teller_choice', function(card, key_phrase) {
         window.scrollTo(0,0);
     }  
     teller_chose = true;
+
+    // Show waiting list
+    document.getElementById("show-who-did-not-choose").style="";
 });
 
 function cardToPlayChosen() {
@@ -200,6 +206,27 @@ function cardSelected(id){
 }
 
 
+
+// VUES C and D-1st part
+socket.on('players_waiting_list', function(waiting_list, current_view) {
+    let ul_waiting_list;
+    if (current_view == "C2") {
+        ul_waiting_list = document.getElementById("list-of-players-who-did-not-choose");
+    } else { //current_view == "D1"
+        ul_waiting_list = document.getElementById("list-of-players-who-did-not-vote");
+    }
+
+    while (ul_waiting_list.hasChildNodes()) {  
+        ul_waiting_list.removeChild(ul_waiting_list.firstChild);
+    }
+
+    for (let i=0; i<waiting_list.length ; i++) {
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode(waiting_list[i]));
+        ul_waiting_list.appendChild(li);
+    }
+
+});
 
 /***************************** VUE D - 1st part : send votes *****************************/
 socket.on('start_guessing', function(nbJoueurs, cartes) {
@@ -276,20 +303,6 @@ function populatePlateau(nbJoueurs, cartes){
         tableau.appendChild(ligne);
     }
 }
-
-socket.on('players_waiting_list', function(waiting_list) {
-    let ul_waiting_list = document.getElementById("list-of-players-who-did-not-vote");
-    while (ul_waiting_list.hasChildNodes()) {  
-        ul_waiting_list.removeChild(ul_waiting_list.firstChild);
-    }
-
-    for (let i=0; i<waiting_list.length ; i++) {
-        let li = document.createElement("li");
-        li.appendChild(document.createTextNode(waiting_list[i]));
-        ul_waiting_list.appendChild(li);
-    }
-
-});
 
 
 /***************************** VUE D - 2nd part : display votes *****************************/
