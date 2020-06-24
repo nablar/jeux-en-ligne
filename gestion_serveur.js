@@ -316,6 +316,22 @@ function total_round_number(socket, number){
   socket.broadcast.emit('send_total_round_number', number);
 }
 
+function timer_time_choice(socket, time, type){
+  console.log(type)
+  if(type == "teller"){
+    console.log("Le temps pour le conteur est " + time);
+    timer_seconds_teller = time;
+  } else if(type == "guesser") {    
+    console.log("Le temps pour les autres joueurs est " + time);
+    timer_seconds = time;
+  } else if(type == "vote"){
+    console.log("Le temps pour le vote est " + time);
+    timer_seconds_vote = time;
+  }
+  socket.emit('send_timer_time', time, type);
+  socket.broadcast.emit('send_timer_time', time, type);
+}
+
 function tirage(socket){
   if(!socket.pseudo){ return; }
 	if(!socket.main){
@@ -436,7 +452,7 @@ function disconnect(socket){
     socket.broadcast.emit('players_list', players);
 
     // Update scores 
-    if(scores !== undefined && socket.pseudo in scores) {
+    if(scores !== undefined && scores !== null && socket.pseudo in scores) {
     	disconnected_players[socket.pseudo]['score'] = scores[socket.pseudo];
       console.log("pseudo removed from scores");
       delete scores[socket.pseudo];
@@ -536,6 +552,7 @@ exports.guesser_choice = guesser_choice;
 exports.guesser_card_to_play = guesser_card_to_play;
 exports.teller_choice = teller_choice;
 exports.total_round_number = total_round_number;
+exports.timer_time_choice = timer_time_choice;
 exports.tirage = tirage;
 exports.pseudo = pseudo;
 exports.disconnect = disconnect;

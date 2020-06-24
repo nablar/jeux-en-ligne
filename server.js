@@ -86,6 +86,10 @@ io.sockets.on('connection', function (socket, pseudo) {
     	gestionServeur.total_round_number(socket, number);
     });
 
+    socket.on('timer_time_choice', function(time, type) {
+    	gestionServeur.timer_time_choice(socket, time, type);
+    });
+
     socket.on('tirage', function(){
     	gestionServeur.tirage(socket);
     });

@@ -9,7 +9,17 @@ body{
   color:white;
   text-align: center;
 }
-#round-number, .phrase-clef, .teller-pseudo{
+
+a{
+  color:mediumpurple;
+}
+ul.no-bullet{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+}
+
+#round-number, #teller-time, #guesser-time, #vote-time, .phrase-clef, .teller-pseudo{
     color:#1983e6;
 }
 .phrase-clef{
@@ -24,10 +34,9 @@ body{
 #top-middle-timer{
     position:fixed;
     top:0;
-    right:0;
-    left:0;
+    margin-left: 50%;
+    margin-right: 50%;
     font-weight: bold;
-    z-index: -1;
 }
 
 .tooltip{
@@ -122,7 +131,7 @@ table{
     padding: 10px 3px 10px 3px;
 }
 
-#round-number-input {
+#round-number-input, #teller-time-input, #guesser-time-input, #vote-time-input {
     width: 3em;
 }
 .show-card-owner{
@@ -242,7 +251,7 @@ body.show-title:after{
   position: fixed; /* Stay in place */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
-  left: 0;
+  left:0;
   background-color: #1A1A1A; 
   overflow-x: hidden; /* Disable horizontal scroll */
   overflow-y:scroll;
