@@ -4,17 +4,18 @@ const gestionScores = require('./gestion_scores');
 let players = [];
 let leader; 
 let teller;
+let tellers_this_turn = [];
 let index_teller = 0;
 let chosen_cards={};
 let guesses={};
 let scores;
 let last_game_scores;
 let total_rounds = 3;
-let done_rounds = 0;
+let global_rounds_done = 0;
 let a_defausser = [];
 let timer_seconds = 120;
 let timer_seconds_teller = 180;
-let timer_seconds_vote = 180;
+let timer_seconds_vote = 120;
 let current_view = "B"; // values : B, C1, C2, D1, D2 and E
 let disconnected_players = {};
 let last_key_phrase = "";
@@ -98,8 +99,12 @@ function check_pseudo(pseudo) {
 }
 
 function next_teller() {
-  index_teller = (index_teller + 1) % players.length;
-  teller = players[index_teller];
+  do {
+    index_teller = (index_teller + 1) % players.length;
+    teller = players[index_teller];
+  }
+  while(!(tellers_this_turn.includes(teller)) && tellers_this_turn.length > 0);
+  tellers_this_turn.splice(tellers_this_turn.indexOf(teller), 1);
 }
 
 function computeScores(){
@@ -115,6 +120,7 @@ function computeScoresOneGame(){
 function reset(){	
 	gestionCartes.chargerCartes();
 	a_defausser = [];
+  tellers_this_turn = [];
 	scores = null;
   disconnected_players = {};
   last_game_scores = null;
@@ -125,7 +131,7 @@ function reset(){
   chosen_cards = {};
   guesses={};
   total_rounds = 3;
-	done_rounds = 0;
+  global_rounds_done = 0;
   current_view = "B";
 }
 
@@ -135,6 +141,7 @@ function defausser_cartes(){
 
 /* Functions using socket */
 function next_turn(socket){
+  console.log("New turn. Teller : ", teller, " tellers_this_turn : ", tellers_this_turn);
   // Re initialize card choices
   guesses = {};
   chosen_cards = {};
@@ -144,9 +151,29 @@ function next_turn(socket){
   a_defausser = [];
 
 
+  socket.emit("phrase_next_turn", "Conteur suivant !")
+  if(tellers_this_turn.length == 1) {
+    if (global_rounds_done == total_rounds - 2) {
+      socket.emit("phrase_next_turn", "Dernier tour !");
+    }  
+    else if(global_rounds_done == total_rounds - 1){
+      socket.emit("phrase_next_turn", "Voir les gagnants !")
+    }
+    else {
+      socket.emit("phrase_next_turn", "Tour suivant !")
+    }
+  }
+  if(tellers_this_turn.length == 0) {
+    tellers_this_turn = Array.from(players);
+    global_rounds_done += 1;
+  }
+
+  // Broadcast round number
+  socket.emit("current_round_number", global_rounds_done + 1);
+  socket.broadcast.emit("current_round_number", global_rounds_done + 1);
+
   // Check if game is finished
-  done_rounds+=1;  
-  if(done_rounds == total_rounds * players.length) {
+  if(global_rounds_done == total_rounds) {
     current_view = "E";
     // Change view
     socket.emit('change_view', "E", players);
@@ -383,6 +410,9 @@ function pseudo(socket, pseudo){
 
     // Send number of rounds
     socket.emit('send_total_round_number', total_rounds);
+    socket.emit('send_timer_time', timer_seconds_teller, "teller")
+    socket.emit('send_timer_time', timer_seconds, "guesser")
+    socket.emit('send_timer_time', timer_seconds_vote, "vote")
     if(pseudo in disconnected_players){
     	socket.main = disconnected_players[pseudo]['jeu'];
 	    scores[pseudo] = 0;
@@ -507,8 +537,9 @@ function start_game(socket) {
   current_view = "C1";
   socket.emit('change_view', "C", players);
   socket.broadcast.emit('change_view', "C", players);
-  index_teller = 0;
-  teller = leader;
+  tellers_this_turn = Array.from(players);
+  index_teller = -1;
+  next_teller();
   socket.emit('new_teller', teller);
   socket.broadcast.emit('new_teller', teller);	
   // Start timer
@@ -571,5 +602,5 @@ exports.chosen_cards = chosen_cards;
 exports.guesses = guesses;
 exports.scores = scores;
 exports.total_rounds = total_rounds;
-exports.done_rounds = done_rounds;
+exports.done_rounds = global_rounds_done;
 exports.a_defausser = [];
