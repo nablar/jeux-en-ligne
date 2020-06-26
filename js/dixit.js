@@ -10,7 +10,7 @@ let teller = false;  // true if the player is the current teller
 let leader = false;  // true if the player is the leader
 let chosen_card_to_play;  // contains the card chosen to display on the board game
 let total_round_number = 3;  // contains the number of rounds chosen by the leader on view B
-let current_round_number = 0;  // contains the number of the current round
+let current_round_number = 1;  // contains the number of the current round
 let cards_can_be_selected = true;  // according to the moment in the game, cards can or cannot be selected
 let current_view;  // contains the letter corresponding to the current view
 let teller_chose = false;  // true if the teller already sent its card and phrase
@@ -609,8 +609,12 @@ document.getElementById("phrase-clef-input-text").addEventListener("keyup", func
   }
 });
 
+socket.on("current_round_number", function(number){
+    current_round_number = number;
+})
 
 socket.on('change_view', function(view, players_list) {
+    if(pseudo === undefined) { return; } // Pseudo not chosen yet
     current_view = view;
     document.getElementsByClassName("current-view")[0].classList.remove("current-view");
     document.getElementById("vue-"+view).classList.add("current-view");
@@ -618,9 +622,7 @@ socket.on('change_view', function(view, players_list) {
     if(view === 'C') {
         showTitle("Voici ton jeu");
         // change round number on top left
-        current_round_number += 1;
-        phrase_next_turn(players_list);
-        document.getElementById("current-round-number").innerHTML = Math.ceil(current_round_number/(players_list.length));
+        document.getElementById("current-round-number").innerHTML = current_round_number;
         document.getElementById("total-round-number").innerHTML = total_round_number;
         change_style_of_class("reveal-after-start", "");
 
@@ -650,20 +652,9 @@ socket.on('change_view', function(view, players_list) {
     }
 });
 
-
-function phrase_next_turn(players_list){    
-    document.getElementById("next-turn-button").value = "Conteur suivant !";
-    if(current_round_number/players_list.length == Math.ceil(current_round_number/players_list.length)){
-        // Nouveau tour
-        document.getElementById("next-turn-button").value = "Tour suivant !";
-        if(Math.ceil((current_round_number+players_list.length)/players_list.length) == total_round_number){
-            document.getElementById("next-turn-button").value = "Dernier tour !";
-        }            
-    }
-    if(current_round_number == total_round_number * players_list.length) {
-        document.getElementById("next-turn-button").value = "Voir les gagnants !";
-    }
-}
+socket.on("phrase_next_turn", function(phrase){
+    document.getElementById("next-turn-button").value = phrase;
+});
 
 socket.on('timer', function(time) {
     document.getElementById("top-middle-timer").innerHTML = time;

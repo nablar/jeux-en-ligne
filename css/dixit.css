@@ -309,9 +309,6 @@ body.show-title:after{
 #subnav-scores-table {
     cursor:default;
 }
-#subnav-content-tellers {
-    margin-bottom:75px;
-}
 
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
