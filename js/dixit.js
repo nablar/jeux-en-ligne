@@ -614,6 +614,7 @@ socket.on("current_round_number", function(number){
 })
 
 socket.on('change_view', function(view, players_list) {
+    if(pseudo === undefined) { return; } // Pseudo not chosen yet
     current_view = view;
     document.getElementsByClassName("current-view")[0].classList.remove("current-view");
     document.getElementById("vue-"+view).classList.add("current-view");

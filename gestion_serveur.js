@@ -9,7 +9,7 @@ let index_teller = 0;
 let chosen_cards={};
 let guesses={};
 let scores;
-let last_game_scores;
+let last_game_scores = {};
 let total_rounds = 3;
 let global_rounds_done = 0;
 let a_defausser = [];
@@ -139,6 +139,15 @@ function defausser_cartes(){
 	gestionCartes.defausserCartes(a_defausser);
 }
 
+function intersection(l1, l2){
+  return l1.filter(function(x) {
+    if(l2.indexOf(x) !=- 1)
+      return true;
+    else
+      return false;
+  });
+}
+
 /* Functions using socket */
 function next_turn(socket){
   console.log("New turn. Teller : ", teller, " tellers_this_turn : ", tellers_this_turn);
@@ -152,7 +161,7 @@ function next_turn(socket){
 
 
   socket.emit("phrase_next_turn", "Conteur suivant !")
-  if(tellers_this_turn.length == 1) {
+  if(intersection(tellers_this_turn, players).length == 1) {
     if (global_rounds_done == total_rounds - 2) {
       socket.emit("phrase_next_turn", "Dernier tour !");
     }  
@@ -163,7 +172,9 @@ function next_turn(socket){
       socket.emit("phrase_next_turn", "Tour suivant !")
     }
   }
-  if(tellers_this_turn.length == 0) {
+
+  // New turn (everybody was counter at least once)
+  if(intersection(tellers_this_turn, players).length == 0) {
     tellers_this_turn = Array.from(players);
     global_rounds_done += 1;
   }
