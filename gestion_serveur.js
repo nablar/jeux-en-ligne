@@ -499,7 +499,7 @@ function disconnect(socket){
       delete scores[socket.pseudo];
     }
 
-    if(last_game_scores !== undefined && socket.pseudo in last_game_scores) {
+    if(last_game_scores !== undefined && last_game_scores !== null && socket.pseudo in last_game_scores) {
     	disconnected_players[socket.pseudo]['last_game_score'] = last_game_scores[socket.pseudo];
       console.log("pseudo removed from last game scores");
       delete last_game_scores[socket.pseudo];
